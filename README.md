@@ -1,1 +1,1 @@
-# proyecto-dise-o2
+# Proyecto Diseño de Algoritmos 2
