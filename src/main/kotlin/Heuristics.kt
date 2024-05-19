@@ -118,7 +118,7 @@ fun heuristic(w:IntArray, p:IntArray,m : Array<IntArray>,i:Int,j:Int,h:String) :
     }
     return -1
 }
-// h puede ser "max" , "QBHH" , "QBH02" , "QBH01"
+// h puede ser "max" , "QBHH" , "QBH02" , "QBH01", "default", "profit/weight", "minweight"
 fun knapsack_heuristics(c: Int, w: IntArray, p: IntArray, n: Int,h:String): Int {
     val m = Array(n + 1) { IntArray(c + 1) }
     for (j in 0..c) m[0][j] = 0
