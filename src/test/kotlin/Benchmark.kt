@@ -1,10 +1,13 @@
-import java.io.File
-import java.util.*
-import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import main.kotlin.Algorithms
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import kotlinx.coroutines.*
+import java.util.*
+import kotlin.system.measureTimeMillis
 
 class Benchmark {
 
@@ -14,7 +17,6 @@ class Benchmark {
 
     private fun load(): List<TestCase> {
         val instances : MutableList<TestCase> = ArrayList()
-
 
         for (source in sources) {
             // Capture the state file
@@ -48,7 +50,7 @@ class Benchmark {
         return instances
     }
 
-    fun test(): Unit = runBlocking {
+    fun test(): Unit = runBlocking(Dispatchers.Default) {
         val instances = load()
         val results : MutableList<TestResult> = ArrayList()
 
@@ -74,6 +76,6 @@ class Benchmark {
         val path = Paths.get("src/test/resources/output.csv")
         val lines = results.map { it.toString() }.toMutableList()
         lines.add(0, TestResult.getHeader())
-        Files.write(path, lines)
+        withContext(Dispatchers.IO) { Files.write(path, lines) }
     }
 }
