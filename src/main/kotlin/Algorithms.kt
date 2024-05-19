@@ -14,9 +14,24 @@ enum class Algorithms {
         }
     },
 
-    KNAPSACK_HEURISTICS {
+    KNAPSACK_HEURISTICS_QBH01 {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             return knapsack_heuristics(c, w, p, n,"QBH01")
+        }
+    },
+    KNAPSACK_HEURISTICS_QBH02 {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            return knapsack_heuristics(c, w, p, n,"QBH02")
+        }
+    },
+    KNAPSACK_HEURISTICS_QBHH {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            return knapsack_heuristics(c, w, p, n,"QBHH")
+        }
+    },
+    KNAPSACK_HEURISTICS_MAX {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            return knapsack_heuristics(c, w, p, n,"max")
         }
     };
 
