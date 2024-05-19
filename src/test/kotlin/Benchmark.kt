@@ -8,8 +8,8 @@ import kotlinx.coroutines.*
 
 class Benchmark {
 
-    private val sources : List<String> = listOf("large_scale", "low-dimensional")
-    // private val sources : List<String> = listOf("low-dimensional")
+    // private val sources : List<String> = listOf("large_scale", "low-dimensional")
+    private val sources : List<String> = listOf("low-dimensional")
     private val classLoader = Thread.currentThread().contextClassLoader
 
     private fun load(): List<TestCase> {

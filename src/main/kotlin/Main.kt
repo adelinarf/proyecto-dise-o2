@@ -11,10 +11,40 @@ fun main() {
     // val c = 5
     // val n = w.size
     // val o = intArrayOf(1, 1, 1, 1, 0, 1, 0, 0, 0, 0)
+
     // println(knapSack2(c, w, p, n))
     // println(o.zip(p).sumOf { (a, b) -> a * b })
     // println()
     // Benchmark().load()
+
+    // var res1 = knapSack2(c, w, p, n)
+    // println(knapSack2(c, w, p, n))
+    // // println(o.zip(p).sumOf { (a, b) -> a * b })
+    // println()
+    // var res2 = knapsack_heuristics(c, w, p, n,"QBH01")
+    // println(knapsack_heuristics(c, w, p, n,"QBH01"))
+    // var res3 = knapsack_heuristics(c,w,p,n,"QBH02")
+    // var res4 = knapsack_heuristics(c,w,p,n,"QBHH")
+    // var res5 = knapsack_heuristics(c,w,p,n,"max")
+
+    // println()
+
+    // println(res1)
+    // println(res2)
+    // println(res3)
+    // println(res4)
+    // println(res5)
+
+    // //ejemplo como el paper para verificar los valores
+    // var p4 = heur(c, w, p, n)
+    // println(p4)
+
+    // var p5 = knapsack_heuristics(c,w,p,n,"default")
+    // println(p5)
+    // var p6 = knapsack_heuristics(c,w,p,n,"profit/weight")
+    // println(p6)
+    // var p7 = knapsack_heuristics(c,w,p,n,"minweight")
+    // println(p7)
 }
 
 fun knapSack(c: Int, w: IntArray, p: IntArray, n: Int): Int {
