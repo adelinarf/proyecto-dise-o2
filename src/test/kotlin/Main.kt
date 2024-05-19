@@ -1,0 +1,5 @@
+
+
+fun main() {
+    Benchmark().test()
+}
