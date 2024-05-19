@@ -124,7 +124,7 @@ fun knapsack_heuristics(c: Int, w: IntArray, p: IntArray, n: Int,h:String): Int 
     for (j in 0..c) m[0][j] = 0
     for (i in 1..n) m[i][0] = 0
 
-    var rep : String = m.map { it.toList().toString() + "\n"}.toString()
+    // var rep : String = m.map { it.toList().toString() + "\n"}.toString()
     // println(rep.replace("[", "").replace("]", "").replace(",", ""))
 
     for (i in 1..n) {
@@ -132,7 +132,7 @@ fun knapsack_heuristics(c: Int, w: IntArray, p: IntArray, n: Int,h:String): Int 
             m[i][j] = if (w[i - 1] > j) m[i - 1][j] else heuristic(w, p, m, i, j, h)
             //max(m[i - 1][j], m[i - 1][j-w[i-1]] + QBH01(w,p)) NO DA EL RESULTADO ESPERADO
 
-            rep = m.map { it.toList().toString() + "\n"}.toString()
+            // rep = m.map { it.toList().toString() + "\n"}.toString()
             // println("\ni = $i j = $j")
             // println(rep.replace("[", "").replace("]", "").replace(",", ""))
         }

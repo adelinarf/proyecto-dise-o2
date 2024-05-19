@@ -12,7 +12,7 @@ enum class Algorithms {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             return knapSack2(c, w, p, n)
         }
-    },
+    }/*,
 
     KNAPSACK_HEURISTICS_QBH01 {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
@@ -33,7 +33,7 @@ enum class Algorithms {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             return knapsack_heuristics(c, w, p, n,"max")
         }
-    };
+    }*/;
 
     abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int
 }
