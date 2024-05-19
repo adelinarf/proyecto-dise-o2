@@ -7,7 +7,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
 
 class Benchmark {
 
@@ -61,7 +61,7 @@ class Benchmark {
                     println("Testing ${instance.name} with ${algorithm.name}...")
 
                     var r: Int
-                    val time = measureTimeMillis {
+                    val time = measureNanoTime {
                         r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
                     }
                     val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)

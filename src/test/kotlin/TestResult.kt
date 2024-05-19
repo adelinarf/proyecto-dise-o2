@@ -8,7 +8,7 @@ data class TestResult (
 ) {
     companion object {
         fun getHeader(): String {
-            return "Instance, Algorithm, Expected, Obtained, Error, Time\n"
+            return "Instance, Algorithm, Expected, Obtained, Error, Time (ns)"
         }
     }
 
