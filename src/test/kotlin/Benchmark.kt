@@ -7,7 +7,10 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class Benchmark {
 
@@ -50,33 +53,55 @@ class Benchmark {
         return instances
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun test(): Unit = runBlocking(Dispatchers.Default) {
         val instances = load()
-        val results : MutableList<TestResult> = ArrayList()
+        val results: MutableList<TestResult> = ArrayList()
 
         val jobs = instances.flatMap { instance ->
-            Algorithms.entries.map { algorithm ->
+            Algorithms.values().map { algorithm ->
                 launch {
                     println("Testing ${instance.name} with ${algorithm.name}...")
 
                     var r: Int
-                    val time = measureTimeMillis {
-                        r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
+                    var time: Long
+
+                    val executor = Executors.newSingleThreadExecutor()
+                    val future = executor.submit<Int> {
+                        algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
                     }
-                    val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)
-                    results.add(testResult)
+                    
+                        try {
+                            time = measureNanoTime {
+                                r = future.get(60, TimeUnit.SECONDS) // Time limit for each test
+                            }
+                            println("Finished test for ${instance.name} with ${algorithm.name}.")
+                        } catch (e: TimeoutException) {
+                            future.cancel(true)
+                            r = -1
+                            time = -1000
+                        } finally {
+                            executor.shutdownNow()
+                        }
+
+
+                    val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time/1000)
+                    synchronized(results) {
+                        results.add(testResult)
+                    }
                 }
             }
         }
 
         // Wait for all coroutines to finish
+        println("Starting join for all jobs...")
         jobs.forEach { it.join() }
+        println("Finished join for all jobs.")
 
         // Export the results
         val path = Paths.get("src/test/resources/output.csv")
         val lines = results.map { it.toString() }.toMutableList()
         lines.add(0, TestResult.getHeader())
         withContext(Dispatchers.IO) { Files.write(path, lines) }
+        println("Finished writing all the test results.")
     }
 }
