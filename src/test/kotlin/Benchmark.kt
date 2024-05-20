@@ -47,6 +47,7 @@ class Benchmark {
         return instances
     }*/
 
+
     private fun loadAlt() : List<TestCase> {
         val instances : MutableList<TestCase> = ArrayList()
 
@@ -56,7 +57,7 @@ class Benchmark {
 
             folder.listFiles()?.forEach { file ->
                 if (file.name.contains("skip") || file.name.contains("README")) return@forEach
-                if (file.name != "knapPI_16_10000_1000.csv") return@forEach
+                if (file.name != "knapPI_16_20_1000.csv") return@forEach
 
 
                 var p = Vector<Int>()
@@ -98,53 +99,34 @@ class Benchmark {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = loadAlt().take(1) // load()
+    suspend fun test() {
+        val timeOut: Long = 100000
+        val instances = loadAlt().takeLast(1)// load()
         val results : MutableList<TestResult> = ArrayList()
 
-         val jobs = instances.flatMap { instance ->
+         instances.flatMap { instance ->
              Algorithms.entries.map { algorithm ->
-                 launch {
+
                     println("Testing ${instance.name} with ${algorithm.name}...")
 
-                    var r: Int = -1
-                    try {
-                        var bestSoFar: Pair<Int, List<Int>>? = null
-                        var wasAborted = false
+                    var r: Int
+                    val time = measureNanoTime {
+                        r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n, timeOut)
 
-                        val time = measureNanoTime {
-                            try {
-                                withTimeout(60000) { // Set your time limit here in milliseconds
-                                    r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n) {
-                                        bestSoFar = it
-                                    }
-                                }
-                            } catch (e: TimeoutCancellationException) {
-                                println("Time limit reached. Saving last best result...")
-                                wasAborted = true
-                            }
-                        }
-
-                        val testResult = if (wasAborted) {
-                            TestResult(instance.name, algorithm.name, instance.o, -1, instance.o + 1, time)
-                        } else {
-                            TestResult(instance.name, algorithm.name, instance.o, bestSoFar?.first ?: r, instance.o - (bestSoFar?.first ?: r), time)
-                        }
-                        results.add(testResult)
-                    } catch (e: Exception) {
-                        println("An error occurred: ${e.message}")
+                        // r = try {
+                        //     algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n, timeOut)
+                        // } catch (e: Exception) { -1 }
                     }
-                 }
+
+                    val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)
+                    results.add(testResult)
              }
          }
-
-        // Wait for all coroutines to finish
-        jobs.forEach { it.join() }
 
         // Export the results
         val path = Paths.get("src/test/resources/output.csv")
         val lines = results.map { it.toString() }.toMutableList()
         lines.add(0, TestResult.getHeader())
-        withContext(Dispatchers.IO) { Files.write(path, lines) }
+        Files.write(path, lines)
     }
 }

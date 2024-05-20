@@ -1,5 +1,5 @@
 
 
-fun main() {
+suspend fun main() {
     Benchmark().test()
 }
