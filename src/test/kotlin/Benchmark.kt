@@ -12,10 +12,10 @@ import kotlin.system.measureNanoTime
 class Benchmark {
 
     // private val sources : List<String> = listOf("large_scale", "low-dimensional")
-    private val sources : List<String> = listOf("low-dimensional")
+    private val sources : List<String> = listOf("heavy")
     private val classLoader = Thread.currentThread().contextClassLoader
 
-    private fun load(): List<TestCase> {
+    /*private fun load(): List<TestCase> {
         val instances : MutableList<TestCase> = ArrayList()
 
         for (source in sources) {
@@ -48,26 +48,74 @@ class Benchmark {
         }
 
         return instances
-    }
+    }*/
 
-    fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = load()
-        val results : MutableList<TestResult> = ArrayList()
+    private fun loadAlt() : List<TestCase> {
+        val instances : MutableList<TestCase> = ArrayList()
 
-        val jobs = instances.flatMap { instance ->
-            Algorithms.entries.map { algorithm ->
-                launch {
-                    println("Testing ${instance.name} with ${algorithm.name}...")
+        for (source in sources) {
+            // Capture the state file
+            val folder = File(classLoader.getResource("benchmark_alt/$source")?.file ?: "")
 
-                    var r: Int
-                    val time = measureNanoTime {
-                        r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
+            folder.listFiles()?.forEach { file ->
+                if (file.name.contains("skip") || file.name.contains("README")) return@forEach
+
+                var p = Vector<Int>()
+                var w = Vector<Int>()
+                var s = Vector<Int>()
+
+                val lines = file.readLines()
+                var i = 0
+                while (i < lines.size) {
+                    if (lines[i].isBlank() || lines[i].startsWith("-")) {
+                        i++
+                        p = Vector<Int>()
+                        w = Vector<Int>()
+                        s = Vector<Int>()
+                        continue
                     }
-                    val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)
-                    results.add(testResult)
+
+                    val name = lines[i++]
+                    val n = lines[i++].split(" ")[1].toInt() - 1
+                    val c = lines[i++].split(" ")[1].toInt()
+                    val o = lines[i++].split(" ")[1].toInt()
+
+                    val limit = i++
+                    while (i < lines.size && lines[i].isNotEmpty() && i <= limit + n) {
+                        val parts = lines[i++].split(",")
+                        p.add(parts[1].toInt())
+                        w.add(parts[2].toInt())
+                        s.add(parts[3].toInt())
+                    }
+                    i++
+
+                    // Create the test case
+                    val testCase = TestCase(name, n, c, p.take(n), w.take(n), s.take(n), o)
+                    instances.add(testCase)
                 }
             }
         }
+        return instances
+    }
+
+    fun test(): Unit = runBlocking(Dispatchers.Default) {
+        val instances = loadAlt().take(10) // load()
+        val results : MutableList<TestResult> = ArrayList()
+
+         val jobs = instances.flatMap { instance ->
+             Algorithms.entries.map { algorithm ->
+                 launch {
+                     println("Testing ${instance.name} with ${algorithm.name}...")
+
+                     var r: Int
+                     val time = measureNanoTime {
+                         r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
+                     }
+                     val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)
+                     results.add(testResult)
+                 }
+             }
+         }
 
         // Wait for all coroutines to finish
         jobs.forEach { it.join() }

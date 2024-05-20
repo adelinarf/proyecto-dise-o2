@@ -6,6 +6,7 @@ data class TestCase(
     val c: Int,
     val p: List<Int>,
     val w: List<Int>,
+    val s: List<Int>,
     val o: Int
 ) {
     override fun equals(other: Any?): Boolean {
@@ -17,8 +18,9 @@ data class TestCase(
         if (name != other.name) return false
         if (n != other.n) return false
         if (c != other.c) return false
-        if (p.sorted() != other.p.sorted()) return false
-        if (w.sorted() != other.w.sorted()) return false
+        if (p != other.p) return false
+        if (w != other.w) return false
+        if (s != other.s) return false
         if (o != other.o) return false
 
         return true
@@ -30,11 +32,12 @@ data class TestCase(
         result = 31 * result + c.hashCode()
         result = 31 * result + p.hashCode()
         result = 31 * result + w.hashCode()
+        result = 31 * result + s.hashCode()
         result = 31 * result + o.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Test: $name\n Instances: $n\n Capacity: $c\n Profits: $p\n Weight: $w\n ------------------------\n"
+        return "Test: $name\n Instances: $n\n Capacity: $c\n Profits: $p\n Weight: $w\n Solution: $s\n ------------------------\n"
     }
 }
