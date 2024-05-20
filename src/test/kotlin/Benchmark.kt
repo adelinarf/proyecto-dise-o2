@@ -55,11 +55,11 @@ class Benchmark {
 
         for (source in sources) {
             // Capture the state file
-            val folder = File(classLoader.getResource("benchmark_alt/$source")?.file ?: "")
+            val folder = File(classLoader.getResource("benchmark_alt_save/$source")?.file ?: "")
 
             folder.listFiles()?.forEach { file ->
                 if (file.name.contains("skip") || file.name.contains("README")) return@forEach
-                //if (file.name != "knapPI_16_10000_1000.csv") return@forEach
+                if (file.name != "knapPI_16_200_1000.csv") return@forEach
 
 
                 var p = Vector<Int>()
@@ -133,7 +133,15 @@ class Benchmark {
                         }
 
 
-                    val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time/1000)
+                    val testResult = TestResult(
+                        instance.name,
+                        algorithm.name,
+                        instance.n,
+                        instance.c,
+                        instance.o,
+                        r,
+                        instance.o - r,
+                        time/1000)
                     synchronized(results) {
                         results.add(testResult)
                     }
