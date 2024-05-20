@@ -3,13 +3,6 @@ package main.kotlin
 import kotlin.math.max
 
 enum class Algorithms {
-
-    /*KNAPSACK {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapSack(c, w, p, n)
-        }
-    },*/
-
     KNAPSACK_DP {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val m = Array(2) { IntArray(c + 1) }
@@ -29,7 +22,20 @@ enum class Algorithms {
 
     KNAPSACK_HEURISTICS {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapsack_heuristics(c, w, p, n,"QBH01")
+            var solution = 0
+            var currentCapacity = c
+
+            val sortedItems = (0 until n).sortedByDescending { p[it] / w[it] }.toMutableList()
+            while (currentCapacity > 0 && sortedItems.isNotEmpty()) {
+                val item = sortedItems.first()
+                if (w[item] <= currentCapacity) {
+                    solution += p[item]
+                    currentCapacity -= w[item]
+                }
+                sortedItems.removeFirst()
+            }
+
+            return solution
         }
     },
 
