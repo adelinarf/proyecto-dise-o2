@@ -1,8 +1,10 @@
 package main.kotlin
 
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.max
 
-fun main() {
+suspend fun main() {
     // val w = intArrayOf(23, 31, 29, 44, 53, 38, 63, 85, 89, 82)
     // val p = intArrayOf(92, 57, 49, 68, 60, 43, 67, 84, 87, 72)
     // val c = 165
@@ -45,6 +47,8 @@ fun main() {
     // println(p6)
     // var p7 = knapsack_heuristics(c,w,p,n,"minweight")
     // println(p7)
+
+    println(knapSack3(50, intArrayOf(10, 20, 30), intArrayOf(60, 100, 120), 3))
 }
 
 fun knapSack(c: Int, w: IntArray, p: IntArray, n: Int): Int {
@@ -54,15 +58,47 @@ fun knapSack(c: Int, w: IntArray, p: IntArray, n: Int): Int {
     else max(p[n - 1] + knapSack(c - w[n - 1], w, p, n - 1), knapSack(c, w, p, n - 1))
 }
 
-fun knapSack2(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-    val m = Array(n + 1) { IntArray(c + 1) }
-    for (j in 0..c) m[0][j] = 0
-    for (i in 1..n) m[i][0] = 0
+suspend fun knapSack2(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long = 10000): Int {
+    var result: Int = -1
 
-    for (i in 1..n) {
-        for (j in 1..c) {
-            m[i][j] = if (w[i - 1] > j) m[i - 1][j] else max(m[i - 1][j], m[i - 1][j - w[i - 1]] + p[i - 1])
+    withTimeoutOrNull(timeout) {
+        val m = Array(n + 1) { IntArray(c + 1) }
+        for (j in 0..c) m[0][j] = 0
+        for (i in 1..n) m[i][0] = 0
+
+        for (i in 1..n) {
+            for (j in 1..c) {
+                if (!isActive) break
+                m[i][j] = if (w[i - 1] > j) m[i - 1][j] else max(m[i - 1][j], m[i - 1][j - w[i - 1]] + p[i - 1])
+            }
+        }
+
+        result = m[n][c]
+    }
+
+    return result
+}
+
+suspend fun knapSack3(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long = 10000): Int {
+    var result: Int = -1
+
+    println("c: $c")
+    println("w: ${w.toList()}")
+    println("p: ${p.toList()}")
+    println("n: $n")
+
+    //withTimeoutOrNull(timeout) {
+    val dp = IntArray(c + 1)
+
+    for (i in 1 until n + 1) {
+        for (j in c downTo 0) {
+            if (w[i - 1] <= j) dp[j] = max(dp[j], dp[j - w[i - 1]] + p[i - 1]
+            )
         }
     }
-    return m[n][c]
+
+    result = dp[c]
+    //}
+
+    return result
 }

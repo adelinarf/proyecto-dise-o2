@@ -2,38 +2,50 @@ package main.kotlin
 
 enum class Algorithms {
 
-    /*KNAPSACK {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapSack(c, w, p, n)
-        }
-    },*/
+    // KNAPSACK {
+    //     override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+    //         return knapSack3(c, w, p, n, timeout)
+    //     }
+    // },
 
-    KNAPSACK2 {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int, callback: (Pair<Int, List<Int>>) -> Unit): Int {
-            return knapSack2(c, w, p, n)
+    HEUR {
+        override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+            return heur(c, w, p, n)
         }
-    }/*,
+    },
 
-    KNAPSACK_HEURISTICS_QBH01 {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapsack_heuristics(c, w, p, n,"QBH01")
+    /*,
+
+    KNAPSACK_LOCAL_SEARCH_SWAP {
+        override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n)
+            val sol = localSearchKnapsack.localSearch(false, timeout)
+            return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     },
-    KNAPSACK_HEURISTICS_QBH02 {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapsack_heuristics(c, w, p, n,"QBH02")
+
+    KNAPSACK_LOCAL_SEARCH_FLIP {
+        override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, 1)
+            val sol = localSearchKnapsack.localSearch(false, timeout)
+            return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     },
-    KNAPSACK_HEURISTICS_QBHH {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapsack_heuristics(c, w, p, n,"QBHH")
+    KNAPSACK_LOCAL_SEARCH_SWAP_GREEDY {
+        override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n)
+            val sol = localSearchKnapsack.localSearch(true, timeout)
+            return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     },
-    KNAPSACK_HEURISTICS_MAX {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            return knapsack_heuristics(c, w, p, n,"max")
+
+    KNAPSACK_LOCAL_SEARCH_FLIP_GREEDY {
+        override suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int {
+            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, 1)
+            val sol = localSearchKnapsack.localSearch(true, timeout)
+            return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     }*/;
 
-    abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int, callback: (Pair<Int, List<Int>>) -> Unit): Int
+    abstract suspend fun solve(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long): Int
 }
