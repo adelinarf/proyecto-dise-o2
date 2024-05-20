@@ -1,7 +1,4 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import main.kotlin.Algorithms
 import java.io.File
 import java.nio.file.Files
@@ -59,6 +56,8 @@ class Benchmark {
 
             folder.listFiles()?.forEach { file ->
                 if (file.name.contains("skip") || file.name.contains("README")) return@forEach
+                if (file.name != "knapPI_16_10000_1000.csv") return@forEach
+
 
                 var p = Vector<Int>()
                 var w = Vector<Int>()
@@ -100,20 +99,41 @@ class Benchmark {
 
     @OptIn(ExperimentalStdlibApi::class)
     fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = loadAlt().take(10) // load()
+        val instances = loadAlt().take(1) // load()
         val results : MutableList<TestResult> = ArrayList()
 
          val jobs = instances.flatMap { instance ->
              Algorithms.entries.map { algorithm ->
                  launch {
-                     println("Testing ${instance.name} with ${algorithm.name}...")
+                    println("Testing ${instance.name} with ${algorithm.name}...")
 
-                     var r: Int
-                     val time = measureNanoTime {
-                         r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
-                     }
-                     val testResult = TestResult(instance.name, algorithm.name, instance.o, r, instance.o - r, time)
-                     results.add(testResult)
+                    var r: Int = -1
+                    try {
+                        var bestSoFar: Pair<Int, List<Int>>? = null
+                        var wasAborted = false
+
+                        val time = measureNanoTime {
+                            try {
+                                withTimeout(60000) { // Set your time limit here in milliseconds
+                                    r = algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n) {
+                                        bestSoFar = it
+                                    }
+                                }
+                            } catch (e: TimeoutCancellationException) {
+                                println("Time limit reached. Saving last best result...")
+                                wasAborted = true
+                            }
+                        }
+
+                        val testResult = if (wasAborted) {
+                            TestResult(instance.name, algorithm.name, instance.o, -1, instance.o + 1, time)
+                        } else {
+                            TestResult(instance.name, algorithm.name, instance.o, bestSoFar?.first ?: r, instance.o - (bestSoFar?.first ?: r), time)
+                        }
+                        results.add(testResult)
+                    } catch (e: Exception) {
+                        println("An error occurred: ${e.message}")
+                    }
                  }
              }
          }

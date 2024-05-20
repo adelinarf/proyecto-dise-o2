@@ -9,7 +9,7 @@ enum class Algorithms {
     },*/
 
     KNAPSACK2 {
-        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int, callback: (Pair<Int, List<Int>>) -> Unit): Int {
             return knapSack2(c, w, p, n)
         }
     }/*,
@@ -35,5 +35,5 @@ enum class Algorithms {
         }
     }*/;
 
-    abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int
+    abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int, callback: (Pair<Int, List<Int>>) -> Unit): Int
 }
