@@ -1,6 +1,6 @@
 package main.kotlin
 
-class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: Int = 1) {
+class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: Int = 0) {
 	
 	fun localSearch(greedy: Boolean = false): IntArray {
 		
@@ -26,8 +26,8 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 
 	private fun neighbors(solution: IntArray): Sequence<IntArray> {
 		return when (neighborhood) {
-			1 -> swapNeighborhood(solution)
-			2 -> flipNeighborhood(solution)
+			0 -> swapNeighborhood(solution)
+			1 -> flipNeighborhood(solution)
 			else -> swapNeighborhood(solution)
 		}
 	}
