@@ -98,6 +98,7 @@ class Benchmark {
         return instances
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun test(): Unit = runBlocking(Dispatchers.Default) {
         val instances = loadAlt().take(10) // load()
         val results : MutableList<TestResult> = ArrayList()
