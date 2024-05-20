@@ -61,20 +61,17 @@ fun knapSack(c: Int, w: IntArray, p: IntArray, n: Int): Int {
 suspend fun knapSack2(c: Int, w: IntArray, p: IntArray, n: Int, timeout: Long = 10000): Int {
     var result: Int = -1
 
-    withTimeoutOrNull(timeout) {
-        val m = Array(n + 1) { IntArray(c + 1) }
-        for (j in 0..c) m[0][j] = 0
-        for (i in 1..n) m[i][0] = 0
+    val m = Array(n + 1) { IntArray(c + 1) }
+    for (j in 0..c) m[0][j] = 0
+    for (i in 1..n) m[i][0] = 0
 
-        for (i in 1..n) {
-            for (j in 1..c) {
-                if (!isActive) break
-                m[i][j] = if (w[i - 1] > j) m[i - 1][j] else max(m[i - 1][j], m[i - 1][j - w[i - 1]] + p[i - 1])
-            }
+    for (i in 1..n) {
+        for (j in 1..c) {
+            m[i][j] = if (w[i - 1] > j) m[i - 1][j] else max(m[i - 1][j], m[i - 1][j - w[i - 1]] + p[i - 1])
         }
-
-        result = m[n][c]
     }
+
+    result = m[n][c]
 
     return result
 }

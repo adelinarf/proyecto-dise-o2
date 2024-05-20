@@ -153,6 +153,8 @@ fun heur(c: Int, w1: IntArray, p1: IntArray, n: Int) : Int {
     var weight = 0
     while (weight < c && w.size >0){
         for (j in 0..w.size-1){
+            if (j < w.size) break
+
             if ((w[j]+weight) > c){
                 w.remove(w[j])
                 p.remove(p[j])
