@@ -42,7 +42,7 @@ enum class Algorithms {
     KNAPSACK_LOCAL_SEARCH_SWAP {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n)
-            val sol = localSearchKnapsack.localSearch()
+            val sol = localSearchKnapsack.localSearch(59000)
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     },
@@ -50,7 +50,7 @@ enum class Algorithms {
     KNAPSACK_LOCAL_SEARCH_FLIP {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, 1)
-            val sol = localSearchKnapsack.localSearch()
+            val sol = localSearchKnapsack.localSearch(59000)
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     };

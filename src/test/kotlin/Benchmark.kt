@@ -12,10 +12,10 @@ import java.util.concurrent.TimeoutException
 class Benchmark {
 
     // private val sources : List<String> = listOf("large_scale", "low-dimensional")
-    private val sources : List<String> = listOf("heavy")
+    // private val sources : List<String> = listOf("heavy")
     private val classLoader = Thread.currentThread().contextClassLoader
 
-    /*private fun load(): List<TestCase> {
+    private fun load(sources: List<String>): List<TestCase> {
         val instances : MutableList<TestCase> = ArrayList()
 
         for (source in sources) {
@@ -48,9 +48,9 @@ class Benchmark {
         }
 
         return instances
-    }*/
+    }
 
-    private fun loadAlt() : List<TestCase> {
+    private fun loadAlt(sources: List<String>) : List<TestCase> {
         val instances : MutableList<TestCase> = ArrayList()
 
         for (source in sources) {
@@ -102,7 +102,8 @@ class Benchmark {
     }
 
     fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = loadAlt()
+        // val instances = loadAlt(listOf("heavy"))
+        val instances = load(listOf("low-dimensional"))
         println(instances.size)
         val results: MutableList<TestResult> = ArrayList()
 
