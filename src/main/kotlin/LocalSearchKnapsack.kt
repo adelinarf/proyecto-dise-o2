@@ -5,16 +5,14 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: Int = 0) {
 	
-	fun localSearch(greedy: Boolean = false): IntArray {
-
+	fun localSearch(timeLimit: Long = 60000, greedy: Boolean = false): IntArray {
+		val end = System.currentTimeMillis() + timeLimit
 		var bestSolution = if (greedy) generateGreedySolution() else generateRandomSolution()
 
 		var currentSolution = IntArray(n) { 0 }
-		// var iter = 0
 
 		while (currentSolution != bestSolution) {
 
-			// println("Iteration ${iter++}: Best solution: ${bestSolution.toList()} - Fitness: ${calculateFitness(bestSolution)}")
 			currentSolution = bestSolution
 
 			for (neighbor in neighbors(currentSolution)) {
@@ -23,8 +21,15 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 					bestSolution = neighbor
 					break
 				}
+
+				if (System.currentTimeMillis() > end) {
+					break
+				}
 			}
 
+			if (System.currentTimeMillis() > end) {
+				break
+			}
 		}
 
 		return bestSolution
