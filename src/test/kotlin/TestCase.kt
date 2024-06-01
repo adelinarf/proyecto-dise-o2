@@ -1,12 +1,12 @@
 data class TestCase(
     val name: String,
-    val n: Int,
-    val c: Int,
-    val p: List<Int>,
-    val w: List<Int>,
-    val z: Int,
-    val s: List<Int>,
-    val t: String
+    val n: Int, // Items
+    val c: Int, // Capacity
+    val p: List<Int>, // Profits
+    val w: List<Int>, // Weights
+    val z: Int, // Optimal profit
+    val s: List<Int>, // Optimal solution
+    val t: String // Correlation Type
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

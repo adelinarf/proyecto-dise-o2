@@ -109,6 +109,7 @@ class Benchmark {
                     val testResult = TestResult(
                         instance.name,
                         algorithm.name,
+                        instance.t,
                         instance.n,
                         instance.c,
                         instance.z,
