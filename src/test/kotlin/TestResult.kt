@@ -1,6 +1,7 @@
 data class TestResult (
     val testInstance: String,
     val algorithmVariant: String,
+    val correlation : String,
     val size: Int,
     val capacity: Int,
     val expected: Int,
@@ -10,11 +11,11 @@ data class TestResult (
 ) {
     companion object {
         fun getHeader(): String {
-            return "Instance, Algorithm, Size, Capacity, Expected, Obtained, Error, Time (ns)"
+            return "Instance, Algorithm, Correlation, Size, Capacity, Expected, Obtained, Error, Time (ns)"
         }
     }
 
     override fun toString(): String {
-        return "$testInstance, $algorithmVariant, $size, $capacity, $expected, $obtained, $error, $executionTime"
+        return "$testInstance, $algorithmVariant, $correlation, $size, $capacity, $expected, $obtained, $error, $executionTime"
     }
 }

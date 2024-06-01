@@ -1,13 +1,12 @@
-import java.util.*
-
 data class TestCase(
     val name: String,
     val n: Int,
     val c: Int,
     val p: List<Int>,
     val w: List<Int>,
-    // val s: List<Int>,
-    val o: Int
+    val z: Int,
+    val s: List<Int>,
+    val t: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -20,8 +19,9 @@ data class TestCase(
         if (c != other.c) return false
         if (p != other.p) return false
         if (w != other.w) return false
-        // if (s != other.s) return false
-        if (o != other.o) return false
+        if (z != other.z) return false
+        if (s != other.s) return false
+        if (t != other.t) return false
 
         return true
     }
@@ -32,12 +32,13 @@ data class TestCase(
         result = 31 * result + c.hashCode()
         result = 31 * result + p.hashCode()
         result = 31 * result + w.hashCode()
-        // result = 31 * result + s.hashCode()
-        result = 31 * result + o.hashCode()
+        result = 31 * result + z.hashCode()
+        result = 31 * result + s.hashCode()
+        result = 31 * result + t.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Test: $name\n Instances: $n\n Capacity: $c\n Profits: $p\n Weight: $w\n ------------------------\n"
+        return "$name\n N: $n\n C: $c\n P: $p\n W: $w\n Z: $z\n T: $t\n ------------------------\n"
     }
 }

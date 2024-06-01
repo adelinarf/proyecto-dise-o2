@@ -11,76 +11,48 @@ import java.util.concurrent.TimeoutException
 
 class Benchmark {
 
-    // private val sources : List<String> = listOf("large_scale", "low-dimensional")
-    private val sources : List<String> = listOf("heavy")
     private val classLoader = Thread.currentThread().contextClassLoader
 
-    /*private fun load(): List<TestCase> {
-        val instances : MutableList<TestCase> = ArrayList()
+    fun load() : List<TestCase> {
+        // Selection of instances
+        val sources : List<String> = listOf("hard")
+        val sizes : List<Int> = listOf(100, 500, 1000, 5000, 10000)
+        val coefRanges : List<Int> = listOf(1000)
+        val types : Map<Int, String> = mapOf(
+            11 to "uncorrelated",
+            12 to "weakly_correlated",
+            13 to "strongly_correlated",
+            14 to "mstr",
+            15 to "pceil",
+            16 to "circle"
+        )
 
+        // Reading process
+        val instances : MutableList<TestCase> = ArrayList()
         for (source in sources) {
-            // Capture the state file
-            val folder = File(classLoader.getResource("benchmark/$source")?.file ?: "")
+            val folder = File(classLoader.getResource("pisinger/$source")?.file ?: "")
 
             folder.listFiles()?.forEach { file ->
-                if (file.name.contains("skip")) return@forEach
+                // Check if file is from the selected sizes and coefRanges
+                val fileName = file.name.split(".")[0].split("_")
+                val type = fileName[1].toInt()
+                val size = fileName[2].toInt()
+                val coefRange = fileName[3].toInt()
+                if (!sizes.contains(size) || !coefRanges.contains(coefRange)) return@forEach;
 
+                // Read the first instance
                 val p = Vector<Int>()
                 val w = Vector<Int>()
-
-                file.forEachLine { line ->
-                    val (value1, value2) = line.split(" ").map { it.toInt() }
-                    p.add(value1)
-                    w.add(value2)
-                }
-
-                // Capture the optimal result file
-                val optimumFileName = "benchmark/$source-optimum/${file.name}"
-                val optimumFile = File(classLoader.getResource(optimumFileName)?.file ?: "")
-                val o = optimumFile.readLines().first().toInt()
-
-                // Create the test case
-                val n = p.removeAt(0).toInt()
-                val c = w.removeAt(0).toInt()
-                val testCase = TestCase(file.name, n, c, p.take(n), w.take(n), o)
-                instances.add(testCase)
-            }
-        }
-
-        return instances
-    }*/
-
-    private fun loadAlt() : List<TestCase> {
-        val instances : MutableList<TestCase> = ArrayList()
-
-        for (source in sources) {
-            // Capture the state file
-            val folder = File(classLoader.getResource("benchmark_alt_save/$source")?.file ?: "")
-
-            folder.listFiles()?.forEach { file ->
-                if (file.name.contains("skip") || file.name.contains("README")) return@forEach
-                if (file.name != "knapPI_16_200_1000.csv") return@forEach
-
-
-                var p = Vector<Int>()
-                var w = Vector<Int>()
-                var s = Vector<Int>()
-
-                val lines = file.readLines()
+                val s = Vector<Int>()
                 var i = 0
+                val lines = file.readLines()
                 while (i < lines.size) {
-                    if (lines[i].isBlank() || lines[i].startsWith("-")) {
-                        i++
-                        p = Vector<Int>()
-                        w = Vector<Int>()
-                        s = Vector<Int>()
-                        continue
-                    }
+                    if (lines[i].isBlank() || lines[i].startsWith("-")) break
 
                     val name = lines[i++]
                     val n = lines[i++].split(" ")[1].toInt() - 1
                     val c = lines[i++].split(" ")[1].toInt()
-                    val o = lines[i++].split(" ")[1].toInt()
+                    val z = lines[i++].split(" ")[1].toInt()
 
                     val limit = i++
                     while (i < lines.size && lines[i].isNotEmpty() && i <= limit + n) {
@@ -92,18 +64,19 @@ class Benchmark {
                     i++
 
                     // Create the test case
-                    val testCase = TestCase(name, n, c, p.take(n), w.take(n), o)
+                    val testCase = TestCase(name, n, c, p.take(n), w.take(n), z, s, types[type] ?: "unknown")
                     instances.add(testCase)
                 }
             }
         }
 
+        //instances.forEach(::println)
+        println(instances.size)
         return instances
     }
 
     fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = loadAlt()
-        println(instances.size)
+        val instances = load()
         val results: MutableList<TestResult> = ArrayList()
 
         val jobs = instances.flatMap { instance ->
@@ -138,9 +111,9 @@ class Benchmark {
                         algorithm.name,
                         instance.n,
                         instance.c,
-                        instance.o,
+                        instance.z,
                         r,
-                        instance.o - r,
+                        instance.z - r,
                         time/1000)
                     synchronized(results) {
                         results.add(testResult)
