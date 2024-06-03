@@ -1,13 +1,12 @@
 package main.kotlin
 
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withTimeoutOrNull
-
 class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: Int = 0) {
-	
+
+	private val ks = SearchUtils(n, capacity, weights, profits);
+
 	fun localSearch(timeLimit: Long = 60000, greedy: Boolean = false): IntArray {
 		val end = System.currentTimeMillis() + timeLimit
-		var bestSolution = if (greedy) generateGreedySolution() else generateRandomSolution()
+		var bestSolution = if (greedy) ks.generateGreedySolution() else ks.generateRandomSolution()
 
 		var currentSolution = IntArray(n) { 0 }
 
@@ -17,7 +16,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 
 			for (neighbor in neighbors(currentSolution)) {
 
-				if (isValidSolution(neighbor) && calculateFitness(neighbor) > calculateFitness(bestSolution)) {
+				if (ks.isValidSolution(neighbor) && ks.calculateFitness(neighbor) > ks.calculateFitness(bestSolution)) {
 					bestSolution = neighbor
 					break
 				}
@@ -43,34 +42,6 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		}
 	}
 
-	private fun generateRandomSolution(): IntArray {
-		val solution = IntArray(n) { 0 }
-		var remainingCapacity = capacity
-
-		for (i in weights.indices.shuffled()) {
-			if (remainingCapacity >= weights[i]) {
-				solution[i] = 1
-				remainingCapacity -= weights[i]
-			}
-		}
-
-		return solution
-	}
-
-	private fun generateGreedySolution(): IntArray {
-		val solution = IntArray(n) { 0 }
-		var remainingCapacity = capacity
-
-		for ((i, _) in profits.sortedByDescending { it }.withIndex()) {
-			if (weights[i] <= remainingCapacity) {
-				solution[i] = 1
-				remainingCapacity -= weights[i]
-			}
-		}
-
-		return solution
-	}
-
 	private fun swapNeighborhood(solution: IntArray): Sequence<IntArray> = sequence {
 		for (i in solution.indices) {
 			for (j in i + 1 until solution.size) {
@@ -88,14 +59,6 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 			neighbor[i] = if (neighbor[i] == 0) 1 else 0
 			yield(neighbor)
 		}
-	}
-
-	private fun isValidSolution(solution: IntArray): Boolean {
-		return solution.zip(weights).sumOf { (a, b) -> a * b } <= capacity
-	}
-
-	private fun calculateFitness(solution: IntArray): Int {
-		return solution.zip(profits).sumOf { (a, b) -> a * b }
 	}
 }
 

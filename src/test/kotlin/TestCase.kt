@@ -1,3 +1,5 @@
+import java.util.*
+
 data class TestCase(
     val name: String,
     val n: Int, // Items
@@ -5,7 +7,7 @@ data class TestCase(
     val p: List<Int>, // Profits
     val w: List<Int>, // Weights
     val z: Int, // Optimal profit
-    val s: List<Int>, // Optimal solution
+    val s: Vector<Int>, // Optimal solution
     val t: String // Correlation Type
 ) {
     override fun equals(other: Any?): Boolean {
@@ -39,6 +41,6 @@ data class TestCase(
     }
 
     override fun toString(): String {
-        return "$name\n N: $n\n C: $c\n P: $p\n W: $w\n Z: $z\n T: $t\n ------------------------\n"
+        return "$name\n N: $n\n C: $c\n P: $p\n W: $w\n Z: $z\n S: $s\n T: $t\n ------------------------\n"
     }
 }

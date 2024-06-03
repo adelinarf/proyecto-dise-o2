@@ -15,10 +15,18 @@ class Benchmark {
 
     fun load() : List<TestCase> {
         // Selection of instances
-        val sources : List<String> = listOf("hard")
-        val sizes : List<Int> = listOf(100, 500, 1000, 5000, 10000)
+        val sources: List<String> = listOf("hard")
+        val sizes: List<Int> = listOf(100, 500, 1000, 5000, 10000)
         val coefRanges : List<Int> = listOf(1000)
         val types : Map<Int, String> = mapOf(
+            // 1 to "uncorrelated",
+            // 2 to "weakly correlated",
+            // 3 to "strongly correlated",
+            // 4 to "inverse strongly correlated",
+            // 5 to "almost strongly correlated",
+            // 6 to "subset sum",
+            // 9 to "similar weights",
+
             11 to "uncorrelated",
             12 to "weakly_correlated",
             13 to "strongly_correlated",
@@ -28,10 +36,11 @@ class Benchmark {
         )
 
         // Reading process
-        val instances : MutableList<TestCase> = ArrayList()
+        val instances: MutableList<TestCase> = ArrayList()
         for (source in sources) {
             val folder = File(classLoader.getResource("pisinger/$source")?.file ?: "")
 
+            val fileInstances: MutableList<TestCase> = ArrayList()
             folder.listFiles()?.forEach { file ->
                 // Check if file is from the selected sizes and coefRanges
                 val fileName = file.name.split(".")[0].split("_")
@@ -41,16 +50,23 @@ class Benchmark {
                 if (!sizes.contains(size) || !coefRanges.contains(coefRange)) return@forEach;
 
                 // Read the first instance
-                val p = Vector<Int>()
-                val w = Vector<Int>()
-                val s = Vector<Int>()
+                var p = Vector<Int>()
+                var w = Vector<Int>()
+                var s = Vector<Int>()
                 var i = 0
                 val lines = file.readLines()
                 while (i < lines.size) {
-                    if (lines[i].isBlank() || lines[i].startsWith("-")) break
+                    //if (lines[i].isBlank() || lines[i].startsWith("-")) break
+                    if (lines[i].isBlank() || lines[i].startsWith("-")) {
+                        i++
+                        p = Vector<Int>()
+                        w = Vector<Int>()
+                        s = Vector<Int>()
+                        continue
+                    }
 
                     val name = lines[i++]
-                    val n = lines[i++].split(" ")[1].toInt() - 1
+                    val n = lines[i++].split(" ")[1].toInt()
                     val c = lines[i++].split(" ")[1].toInt()
                     val z = lines[i++].split(" ")[1].toInt()
 
@@ -65,13 +81,14 @@ class Benchmark {
 
                     // Create the test case
                     val testCase = TestCase(name, n, c, p.take(n), w.take(n), z, s, types[type] ?: "unknown")
-                    instances.add(testCase)
+                    fileInstances.add(testCase)
                 }
+                instances.add(fileInstances[fileInstances.size - 1])
             }
         }
 
-        //instances.forEach(::println)
-        println(instances.size)
+        // instances.forEach(::println)
+        // println(instances.size)
         return instances
     }
 
@@ -80,7 +97,7 @@ class Benchmark {
         val results: MutableList<TestResult> = ArrayList()
 
         val jobs = instances.flatMap { instance ->
-            Algorithms.values().map { algorithm ->
+            Algorithms.values().filter{ algorithm -> algorithm.isActive() }.map { algorithm ->
                 launch {
                     println("Testing ${instance.name} with ${algorithm.name}...")
 
@@ -94,7 +111,7 @@ class Benchmark {
                     
                         try {
                             time = measureNanoTime {
-                                r = future.get(60, TimeUnit.SECONDS) // Time limit for each test
+                                r = future.get(300000, TimeUnit.SECONDS) // Time limit for each test
                             }
                             println("Finished test for ${instance.name} with ${algorithm.name}.")
                         } catch (e: TimeoutException) {
