@@ -69,9 +69,12 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
     fun solve(timeLimit: Int = _timeLimit): IntArray {
         var population: MutableList<IntArray> = MutableList(populationSize) { ks.generateRandomSolution() }
         var bestSolution = population.maxBy { ks.calculateFitness(it) }
+        var generations = 0
+        var lastGenerationForBestSolution = 0
 
         while (true) {
             if (System.currentTimeMillis() > timeLimit) break
+            if (generations - lastGenerationForBestSolution > 1000) break
 
             val parents = getParents(population) // Parents compete
             val children = getChildren(parents.toMutableList()) // Parents crossover and children mutation
@@ -79,7 +82,12 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
             population = population.shuffled().toMutableList()
 
             val populationBest = population.maxBy { ks.calculateFitness(it) }
-            if (ks.calculateFitness(bestSolution) < ks.calculateFitness(populationBest)) bestSolution = populationBest
+            if (ks.calculateFitness(bestSolution) < ks.calculateFitness(populationBest)) {
+                bestSolution = populationBest
+                lastGenerationForBestSolution = generations
+            }
+
+            generations++
         }
 
         return bestSolution

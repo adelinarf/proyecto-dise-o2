@@ -15,24 +15,24 @@ class Benchmark {
 
     fun load() : List<TestCase> {
         // Selection of instances
-        val sources: List<String> = listOf("hard")
+        val sources: List<String> = listOf("small-coef")
         val sizes: List<Int> = listOf(100, 500, 1000, 5000, 10000)
-        val coefRanges : List<Int> = listOf(1000)
+        val coefRanges : List<Int> = listOf(10000)
         val types : Map<Int, String> = mapOf(
-            // 1 to "uncorrelated",
-            // 2 to "weakly correlated",
-            // 3 to "strongly correlated",
-            // 4 to "inverse strongly correlated",
-            // 5 to "almost strongly correlated",
-            // 6 to "subset sum",
-            // 9 to "similar weights",
+            1 to "uncorrelated",
+            2 to "weakly correlated",
+            3 to "strongly correlated",
+            4 to "inverse strongly correlated",
+            5 to "almost strongly correlated",
+            6 to "subset sum",
+            9 to "similar weights",
 
-            11 to "uncorrelated",
-            12 to "weakly_correlated",
-            13 to "strongly_correlated",
-            14 to "mstr",
-            15 to "pceil",
-            16 to "circle"
+            // 11 to "uncorrelated",
+            // 12 to "weakly_correlated",
+            // 13 to "strongly_correlated",
+            // 14 to "mstr",
+            // 15 to "pceil",
+            // 16 to "circle"
         )
 
         // Reading process
@@ -111,7 +111,7 @@ class Benchmark {
                     
                         try {
                             time = measureNanoTime {
-                                r = future.get(300000, TimeUnit.SECONDS) // Time limit for each test
+                                r = future.get(120, TimeUnit.SECONDS) // Time limit for each test
                             }
                             println("Finished test for ${instance.name} with ${algorithm.name}.")
                         } catch (e: TimeoutException) {
