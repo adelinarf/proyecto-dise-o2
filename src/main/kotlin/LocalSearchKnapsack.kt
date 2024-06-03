@@ -35,7 +35,37 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		return bestSolution
 	}
 
-	private fun neighbors(solution: IntArray): Sequence<IntArray> {
+	fun localSearch2(timeLimit: Long = 60000, greedy: IntArray): IntArray {
+		val end = System.currentTimeMillis() + timeLimit
+		var bestSolution = greedy
+
+		var currentSolution = IntArray(n) { 0 }
+
+		while (currentSolution != bestSolution) {
+
+			currentSolution = bestSolution
+
+			for (neighbor in neighbors(currentSolution)) {
+
+				if (isValidSolution(neighbor) && calculateFitness(neighbor) > calculateFitness(bestSolution)) {
+					bestSolution = neighbor
+					break
+				}
+
+				if (System.currentTimeMillis() > end) {
+					break
+				}
+			}
+
+			if (System.currentTimeMillis() > end) {
+				break
+			}
+		}
+
+		return bestSolution
+	}
+
+	fun neighbors(solution: IntArray): Sequence<IntArray> {
 		return when (neighborhood) {
 			0 -> swapNeighborhood(solution)
 			1 -> flipNeighborhood(solution)
@@ -43,7 +73,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		}
 	}
 
-	private fun generateRandomSolution(): IntArray {
+	fun generateRandomSolution(): IntArray {
 		val solution = IntArray(n) { 0 }
 		var remainingCapacity = capacity
 
@@ -57,7 +87,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		return solution
 	}
 
-	private fun generateGreedySolution(): IntArray {
+	fun generateGreedySolution(): IntArray {
 		val solution = IntArray(n) { 0 }
 		var remainingCapacity = capacity
 
@@ -94,7 +124,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		return solution.zip(weights).sumOf { (a, b) -> a * b } <= capacity
 	}
 
-	private fun calculateFitness(solution: IntArray): Int {
+	fun calculateFitness(solution: IntArray): Int {
 		return solution.zip(profits).sumOf { (a, b) -> a * b }
 	}
 }
