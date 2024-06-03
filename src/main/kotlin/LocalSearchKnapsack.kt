@@ -34,12 +34,70 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		return bestSolution
 	}
 
-	private fun neighbors(solution: IntArray): Sequence<IntArray> {
+	fun localSearch2(timeLimit: Long = 60000, greedy: IntArray): IntArray {
+		val end = System.currentTimeMillis() + timeLimit
+		var bestSolution = greedy
+
+		var currentSolution = IntArray(n) { 0 }
+
+		while (currentSolution != bestSolution) {
+
+			currentSolution = bestSolution
+
+			for (neighbor in neighbors(currentSolution)) {
+
+				if (isValidSolution(neighbor) && calculateFitness(neighbor) > calculateFitness(bestSolution)) {
+					bestSolution = neighbor
+					break
+				}
+
+				if (System.currentTimeMillis() > end) {
+					break
+				}
+			}
+
+			if (System.currentTimeMillis() > end) {
+				break
+			}
+		}
+
+		return bestSolution
+	}
+
+	fun neighbors(solution: IntArray): Sequence<IntArray> {
 		return when (neighborhood) {
 			0 -> swapNeighborhood(solution)
 			1 -> flipNeighborhood(solution)
 			else -> swapNeighborhood(solution)
 		}
+	}
+
+	fun generateRandomSolution(): IntArray {
+		val solution = IntArray(n) { 0 }
+		var remainingCapacity = capacity
+
+		for (i in weights.indices.shuffled()) {
+			if (remainingCapacity >= weights[i]) {
+				solution[i] = 1
+				remainingCapacity -= weights[i]
+			}
+		}
+
+		return solution
+	}
+
+	fun generateGreedySolution(): IntArray {
+		val solution = IntArray(n) { 0 }
+		var remainingCapacity = capacity
+
+		for ((i, _) in profits.sortedByDescending { it }.withIndex()) {
+			if (weights[i] <= remainingCapacity) {
+				solution[i] = 1
+				remainingCapacity -= weights[i]
+			}
+		}
+
+		return solution
 	}
 
 	private fun swapNeighborhood(solution: IntArray): Sequence<IntArray> = sequence {
@@ -60,6 +118,15 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 			yield(neighbor)
 		}
 	}
+
+	private fun isValidSolution(solution: IntArray): Boolean {
+		return solution.zip(weights).sumOf { (a, b) -> a * b } <= capacity
+	}
+
+	fun calculateFitness(solution: IntArray): Int {
+		return solution.zip(profits).sumOf { (a, b) -> a * b }
+	}
+
 }
 
 // Usage example
