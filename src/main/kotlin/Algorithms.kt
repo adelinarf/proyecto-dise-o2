@@ -1,8 +1,8 @@
 package main.kotlin
 import kotlin.math.max
 
-var TIME_LIMIT_MS = 120000
-var MAX_ITERATIONS = 10000
+var TIME_LIMIT_MS = 120_000
+var MAX_ITERATIONS = 10_000
 var MAX_ITER_WITHOUT_IMPROVE = 10
 
 enum class Algorithms {
@@ -46,7 +46,7 @@ enum class Algorithms {
         }
 
         override fun isActive(): Boolean {
-            return false
+            return true
         }
     },
 
@@ -71,7 +71,7 @@ enum class Algorithms {
         }
 
         override fun isActive(): Boolean {
-            return false
+            return true
         }
     },
 
@@ -83,7 +83,7 @@ enum class Algorithms {
         }
 
         override fun isActive(): Boolean {
-            return true
+            return false
         }
     },
 

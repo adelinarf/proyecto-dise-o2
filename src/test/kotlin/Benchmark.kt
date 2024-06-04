@@ -1,16 +1,26 @@
 import kotlinx.coroutines.*
 import main.kotlin.Algorithms
 import main.kotlin.TIME_LIMIT_MS
+import main.kotlin.MAX_ITERATIONS
+import main.kotlin.MAX_ITER_WITHOUT_IMPROVE
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import kotlin.system.measureNanoTime
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import kotlin.system.measureTimeMillis
 
 class Benchmark {
+    // Includes slack time for calculating result data
+    private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 20_000L
+    init {
+        // Set global testing parameters
+        TIME_LIMIT_MS = 10_000
+        MAX_ITERATIONS = 10_000
+        MAX_ITER_WITHOUT_IMPROVE = 10
+    }
 
     private val classLoader = Thread.currentThread().contextClassLoader
 
@@ -111,14 +121,15 @@ class Benchmark {
                     }
                     
                         try {
-                            time = measureNanoTime {
-                                r = future.get(TIME_LIMIT_MS+2000L, TimeUnit.MILLISECONDS) // Time limit for each test
+                            time = measureTimeMillis {
+                                println("TESTEANDO CON LIMITE DE $TEST_LIMIT_MS")
+                                r = future.get(TEST_LIMIT_MS, TimeUnit.MILLISECONDS) // Time limit for each test
                             }
                             println("Finished test for ${instance.name} with ${algorithm.name}.")
                         } catch (e: TimeoutException) {
                             future.cancel(true)
                             r = -1
-                            time = -1000
+                            time = Long.MAX_VALUE
                         } finally {
                             executor.shutdownNow()
                         }
@@ -133,7 +144,7 @@ class Benchmark {
                         instance.z,
                         r,
                         instance.z - r,
-                        time/1000)
+                        time)
                     synchronized(results) {
                         results.add(testResult)
                     }

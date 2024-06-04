@@ -4,6 +4,8 @@ class GraspKnapsack(private val capacity: Int, private val weights: IntArray, pr
 	private val ks = SearchUtils(n, capacity, weights, profits)
 
 	fun grasp(alpha: Double = 0.5): IntArray {
+		val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
+
 		var bestSolution = generateRandomizedGreedySolution(alpha)
 		var bestValue = ks.calculateFitness(bestSolution)
 		var iterationsWithoutImprovement = 0
@@ -23,6 +25,10 @@ class GraspKnapsack(private val capacity: Int, private val weights: IntArray, pr
 			}
 
 			if (iterationsWithoutImprovement > MAX_ITER_WITHOUT_IMPROVE) {
+				break
+			}
+
+			if (System.currentTimeMillis() > endTime) {
 				break
 			}
 		}

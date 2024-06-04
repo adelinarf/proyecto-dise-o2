@@ -11,7 +11,7 @@ data class TestResult (
 ) {
     companion object {
         fun getHeader(): String {
-            return "Instance, Algorithm, Correlation, Size, Capacity, Expected, Obtained, Error, Time (ns)"
+            return "Instance, Algorithm, Correlation, Size, Capacity, Expected, Obtained, Error, Time (ms)"
         }
     }
 

@@ -6,6 +6,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 
 	fun localSearch(start: IntArray = intArrayOf(-1), greedy: Boolean = false): IntArray {
 		val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
+
 		var bestSolution = start
 		if (bestSolution[0] == -1) {
 			bestSolution = if (greedy) ks.generateGreedySolution() else ks.generateRandomSolution()
@@ -24,12 +25,8 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 				}
 
 				if (System.currentTimeMillis() > endTime) {
-					break
+					return bestSolution
 				}
-			}
-
-			if (System.currentTimeMillis() > endTime) {
-				break
 			}
 
 			if (currentSolution == bestSolution) {
