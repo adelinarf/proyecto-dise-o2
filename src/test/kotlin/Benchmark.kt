@@ -1,5 +1,6 @@
 import kotlinx.coroutines.*
 import main.kotlin.Algorithms
+import main.kotlin.TIME_LIMIT_MS
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -111,7 +112,7 @@ class Benchmark {
                     
                         try {
                             time = measureNanoTime {
-                                r = future.get(120, TimeUnit.SECONDS) // Time limit for each test
+                                r = future.get(TIME_LIMIT_MS+2000L, TimeUnit.MILLISECONDS) // Time limit for each test
                             }
                             println("Finished test for ${instance.name} with ${algorithm.name}.")
                         } catch (e: TimeoutException) {

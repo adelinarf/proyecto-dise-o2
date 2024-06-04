@@ -6,7 +6,6 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
 
     private val crossoverRange = 0.45..0.65
     private val mutationRate = 0.1
-    private val _timeLimit = 300000
     private val ks = SearchUtils(n, capacity, weights, profits)
 
     private fun compete(firstGenotype: IntArray, secondGenotype: IntArray) : IntArray {
@@ -66,14 +65,15 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
         return children
     }
 
-    fun solve(timeLimit: Int = _timeLimit): IntArray {
+    fun solve(): IntArray {
         var population: MutableList<IntArray> = MutableList(populationSize) { ks.generateRandomSolution() }
         var bestSolution = population.maxBy { ks.calculateFitness(it) }
         var generations = 0
         var lastGenerationForBestSolution = 0
+        val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
 
         while (true) {
-            if (System.currentTimeMillis() > timeLimit) break
+            if (System.currentTimeMillis() > endTime) break
             if (generations - lastGenerationForBestSolution > 1000) break
 
             val parents = getParents(population) // Parents compete

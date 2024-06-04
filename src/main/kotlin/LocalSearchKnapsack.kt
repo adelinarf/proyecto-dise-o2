@@ -4,13 +4,15 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 
 	private val ks = SearchUtils(n, capacity, weights, profits);
 
-	fun localSearch(timeLimit: Long = 60000, greedy: Boolean = false): IntArray {
-		val end = System.currentTimeMillis() + timeLimit
-		var bestSolution = if (greedy) ks.generateGreedySolution() else ks.generateRandomSolution()
-
+	fun localSearch(start: IntArray = intArrayOf(-1), greedy: Boolean = false): IntArray {
+		val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
+		var bestSolution = start
+		if (bestSolution[0] == -1) {
+			bestSolution = if (greedy) ks.generateGreedySolution() else ks.generateRandomSolution()
+		}
 		var currentSolution = IntArray(n) { 0 }
 
-		while (currentSolution != bestSolution) {
+		for (i in 0 until MAX_ITERATIONS) {
 
 			currentSolution = bestSolution
 
@@ -21,42 +23,16 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 					break
 				}
 
-				if (System.currentTimeMillis() > end) {
+				if (System.currentTimeMillis() > endTime) {
 					break
 				}
 			}
 
-			if (System.currentTimeMillis() > end) {
+			if (System.currentTimeMillis() > endTime) {
 				break
 			}
-		}
 
-		return bestSolution
-	}
-
-	fun localSearch2(timeLimit: Long = 60000, greedy: IntArray): IntArray {
-		val end = System.currentTimeMillis() + timeLimit
-		var bestSolution = greedy
-
-		var currentSolution = IntArray(n) { 0 }
-
-		while (currentSolution != bestSolution) {
-
-			currentSolution = bestSolution
-
-			for (neighbor in neighbors(currentSolution)) {
-
-				if (isValidSolution(neighbor) && calculateFitness(neighbor) > calculateFitness(bestSolution)) {
-					bestSolution = neighbor
-					break
-				}
-
-				if (System.currentTimeMillis() > end) {
-					break
-				}
-			}
-
-			if (System.currentTimeMillis() > end) {
+			if (currentSolution == bestSolution) {
 				break
 			}
 		}

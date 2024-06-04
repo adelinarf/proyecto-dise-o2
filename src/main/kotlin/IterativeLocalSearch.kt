@@ -1,8 +1,5 @@
 package main.kotlin
 
-import main.kotlin.LocalSearchKnapsack
-import kotlin.math.max
-
 fun criterio_aceptacion(best_Sol: IntArray, next_Best : IntArray,memoria: MutableList<IntArray>, localSearch: LocalSearchKnapsack) : IntArray {
     val a = localSearch.calculateFitness(best_Sol)
     val b = localSearch.calculateFitness(next_Best)
@@ -79,13 +76,13 @@ fun iterativeLocalSearch() : IntArray{
     val p = intArrayOf(10, 15, 20, 25)
     val localSearchKnapsack = LocalSearchKnapsack(capacity, w, p, w.size)
     val S_0 = localSearchKnapsack.generateGreedySolution()
-    var S_p = localSearchKnapsack.localSearch2(greedy=S_0)
+    var S_p = localSearchKnapsack.localSearch(S_0)
     println(S_p.toList())
     val memoria : MutableList<IntArray> = mutableListOf()
     var counter = 0
     while (counter<100){//(criterio_terminacion(S_p) == false){
         val Sp = perturbacion(S_p,memoria,w,capacity,localSearchKnapsack);
-        val Spp = localSearchKnapsack.localSearch2(greedy=Sp);
+        val Spp = localSearchKnapsack.localSearch(Sp);
         S_p = criterio_aceptacion(S_p,Spp,memoria,localSearchKnapsack)
         counter+=1
     }

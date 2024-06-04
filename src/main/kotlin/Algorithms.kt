@@ -1,6 +1,9 @@
 package main.kotlin
-
 import kotlin.math.max
+
+var TIME_LIMIT_MS = 120000
+var MAX_ITERATIONS = 10000
+var MAX_ITER_WITHOUT_IMPROVE = 10
 
 enum class Algorithms {
     KNAPSACK_DP {
@@ -50,7 +53,7 @@ enum class Algorithms {
     KNAPSACK_LOCAL_SEARCH_SWAP {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n)
-            val sol = localSearchKnapsack.localSearch(59000)
+            val sol = localSearchKnapsack.localSearch()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
 
@@ -63,7 +66,7 @@ enum class Algorithms {
 
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, 1)
-            val sol = localSearchKnapsack.localSearch(59000)
+            val sol = localSearchKnapsack.localSearch()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
 
@@ -76,6 +79,18 @@ enum class Algorithms {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val genetic = Genetic(n, c, w, p, 1000)
             val sol = genetic.solve()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
+
+        override fun isActive(): Boolean {
+            return true
+        }
+    },
+
+    KNAPSACK_GRASP {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val graspKnapsack = GraspKnapsack(c, w, p, n)
+            val sol = graspKnapsack.grasp()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
 
