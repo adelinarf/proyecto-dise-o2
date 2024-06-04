@@ -32,15 +32,15 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
         val crossoverRate = Random().nextDouble() * (crossoverRange.endInclusive - crossoverRange.start) + crossoverRange.start
         val genotypeCutAt: Int = (firstGenotype.size * crossoverRate).toInt()
 
-        var child: IntArray = firstGenotype.slice(0..genotypeCutAt).toIntArray()
-        child += secondGenotype.slice(genotypeCutAt + 1..secondGenotype.size).toIntArray()
+        var child: IntArray = firstGenotype.slice(0 until genotypeCutAt).toIntArray()
+        child += secondGenotype.slice(genotypeCutAt  until secondGenotype.size).toIntArray()
 
         return child
     }
 
     private fun mutate(genotype: IntArray): IntArray {
         for (i in genotype.indices) {
-            if (Random().nextDouble() < mutationRate) genotype[i] = if (genotype[i] == 0) 1 else 0
+            if (Random().nextDouble() < mutationRate) genotype[i] = genotype[i] xor 1
         }
         return genotype
     }
@@ -61,6 +61,8 @@ class Genetic (private val n: Int, private val capacity: Int, private val weight
             while (!ks.isValidSolution(secondChild)) secondChild = mutate(crossover(secondParent, firstParent))
             children.add(secondChild)
         }
+
+        children.addAll(population)
 
         return children
     }

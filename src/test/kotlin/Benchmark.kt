@@ -27,7 +27,7 @@ class Benchmark {
                 "KNAPSACK_HEURISTICS",
                 "KNAPSACK_LOCAL_SEARCH_SWAP",
                 "KNAPSACK_LOCAL_SEARCH_FLIP",
-                // "KNAPSACK_GENETIC",
+                "KNAPSACK_GENETIC",
                 "KNAPSACK_GRASP"
             )
         )
