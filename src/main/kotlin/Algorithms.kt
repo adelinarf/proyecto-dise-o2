@@ -21,10 +21,6 @@ enum class Algorithms {
 
             return m[n and 1][c]
         }
-
-        override fun isActive(): Boolean {
-            return true
-        }
     },
 
     KNAPSACK_HEURISTICS {
@@ -44,10 +40,6 @@ enum class Algorithms {
 
             return solution
         }
-
-        override fun isActive(): Boolean {
-            return true
-        }
     },
 
     KNAPSACK_LOCAL_SEARCH_SWAP {
@@ -55,10 +47,6 @@ enum class Algorithms {
             val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n)
             val sol = localSearchKnapsack.localSearch()
             return sol.zip(p).sumOf { (a, b) -> a * b }
-        }
-
-        override fun isActive(): Boolean {
-            return false
         }
     },
 
@@ -69,10 +57,6 @@ enum class Algorithms {
             val sol = localSearchKnapsack.localSearch()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
-
-        override fun isActive(): Boolean {
-            return true
-        }
     },
 
     KNAPSACK_GENETIC {
@@ -80,10 +64,6 @@ enum class Algorithms {
             val genetic = Genetic(n, c, w, p, 1000)
             val sol = genetic.solve()
             return sol.zip(p).sumOf { (a, b) -> a * b }
-        }
-
-        override fun isActive(): Boolean {
-            return false
         }
     },
 
@@ -93,12 +73,7 @@ enum class Algorithms {
             val sol = graspKnapsack.grasp()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
-
-        override fun isActive(): Boolean {
-            return true
-        }
     };
 
     abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int
-    abstract fun isActive(): Boolean
 }

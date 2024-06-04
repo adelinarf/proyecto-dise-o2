@@ -15,11 +15,22 @@ import kotlin.system.measureTimeMillis
 class Benchmark {
     // Includes slack time for calculating result data
     private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 20_000L
+    private val algorithms = mutableListOf<String>()
     init {
         // Set global testing parameters
-        TIME_LIMIT_MS = 10_000
+        TIME_LIMIT_MS = 60_000
         MAX_ITERATIONS = 10_000
         MAX_ITER_WITHOUT_IMPROVE = 10
+        algorithms.addAll(
+            mutableListOf(
+                "KNAPSACK_DP",
+                "KNAPSACK_HEURISTICS",
+                "KNAPSACK_LOCAL_SEARCH_SWAP",
+                "KNAPSACK_LOCAL_SEARCH_FLIP",
+                // "KNAPSACK_GENETIC",
+                "KNAPSACK_GRASP"
+            )
+        )
     }
 
     private val classLoader = Thread.currentThread().contextClassLoader
@@ -108,7 +119,7 @@ class Benchmark {
         val results: MutableList<TestResult> = ArrayList()
 
         val jobs = instances.flatMap { instance ->
-            Algorithms.values().filter{ algorithm -> algorithm.isActive() }.map { algorithm ->
+            Algorithms.values().filter{ algorithm -> isActive(algorithm) }.map { algorithm ->
                 launch {
                     println("Testing ${instance.name} with ${algorithm.name}...")
 
@@ -122,7 +133,6 @@ class Benchmark {
                     
                         try {
                             time = measureTimeMillis {
-                                println("TESTEANDO CON LIMITE DE $TEST_LIMIT_MS")
                                 r = future.get(TEST_LIMIT_MS, TimeUnit.MILLISECONDS) // Time limit for each test
                             }
                             println("Finished test for ${instance.name} with ${algorithm.name}.")
@@ -165,5 +175,9 @@ class Benchmark {
         withContext(Dispatchers.IO) { Files.write(path, lines) }
         println("Finished writing all the test results.")
 
+    }
+
+    fun isActive(algorithm: Algorithms): Boolean {
+        return algorithms.contains(algorithm.name)
     }
 }
