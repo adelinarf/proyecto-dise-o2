@@ -59,6 +59,30 @@ enum class Algorithms {
         }
     },
 
+    KNAPSACK_ITERATIVE_LOCAL_SEARCH {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val knapsackILS = IterativeLocalSearch(c, w, p, n)
+            val sol = knapsackILS.iterativeLocalSearch()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
+    },
+
+    KNAPSACK_TABU_SEARCH {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val tabuSearch = TabuSearch(c, w, p, n)
+            val sol = tabuSearch.tabuSearch()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
+    },
+
+    KNAPSACK_SIMULATED_ANNEALING {
+      override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+          val sa = SimulatedAnnealing(c, w, p, n)
+          val sol = sa.simulatedAnnealing()
+          return sol.zip(p).sumOf { (a, b) -> a * b }
+      }
+    },
+
     KNAPSACK_GENETIC {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val genetic = Genetic(n, c, w, p, 1000)
