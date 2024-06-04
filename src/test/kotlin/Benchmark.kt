@@ -14,11 +14,11 @@ import kotlin.system.measureTimeMillis
 
 class Benchmark {
     // Includes slack time for calculating result data
-    private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 60_000L
+    private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 20_000L
     private val algorithms = mutableListOf<String>()
     init {
         // Set global testing parameters
-        TIME_LIMIT_MS = 120_000
+        TIME_LIMIT_MS = 30_000
         MAX_ITERATIONS = 10_000
         MAX_ITER_WITHOUT_IMPROVE = 10
         algorithms.addAll(
@@ -27,6 +27,9 @@ class Benchmark {
                 "KNAPSACK_HEURISTICS",
                 "KNAPSACK_LOCAL_SEARCH_SWAP",
                 "KNAPSACK_LOCAL_SEARCH_FLIP",
+                "KNAPSACK_ITERATIVE_LOCAL_SEARCH",
+                "KNAPSACK_TABU_SEARCH",
+                "KNAPSACK_SIMULATED_ANNEALING",
                 "KNAPSACK_GENETIC",
                 "KNAPSACK_GRASP"
             )
