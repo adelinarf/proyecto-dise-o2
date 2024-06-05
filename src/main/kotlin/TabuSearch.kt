@@ -30,7 +30,33 @@ class TabuSearch(private val capacity: Int, private val w: IntArray, private val
         return m.asSequence()
     }
 
+    fun swapTabu(solution : IntArray, outside : MutableList<Int>) = sequence {
+        for (i in solution.indices) {
+            for (j in 1 .. outside.size-1) {
+                val neighbor = solution.copyOf()
+                neighbor[i] = solution[outside[j]]
+                neighbor[outside[j]] = solution[i]
+                yield(neighbor)
+            }
+        }
+    }
+
     fun updateTabu(neighborhood : Sequence<IntArray>, S:IntArray, Tabu: MutableList<IntArray>) : Sequence<IntArray>{
+        var inside = mutableListOf<Int>()
+        var outside = mutableListOf<Int>()
+        for (x in 1..S.size-1){
+            if (S[x]==1){
+                inside.add(x)
+            }
+            else{
+                outside.add(x)
+            }
+        }
+        val seq = swapTabu(S,outside)
+
+
+
+
         var neighborhood = localSearchKnapsack.neighbors(S)
         var counter = 0
         /*for (y in neighborhood){
@@ -50,11 +76,11 @@ class TabuSearch(private val capacity: Int, private val w: IntArray, private val
             counter+=1
         }*/
         Tabu.add(S)
-        for (x in neighborhood){
+        /*for (x in neighborhood){
             if (x contentEquals S){
                 neighborhood = remove(neighborhood,x)
             }
-        }
+        }*/
         //Criterio de aceptacion, si esta en Tabu pero logra un mejor resultado, se agrega a la vecindad
         /*for (x in Tabu){
             if (System.currentTimeMillis() > endTime){
@@ -64,7 +90,7 @@ class TabuSearch(private val capacity: Int, private val w: IntArray, private val
                 neighborhood = add(neighborhood,x)
             }
         }*/
-        return neighborhood
+        return seq
     }
 
     fun tabuSearch() : IntArray{
