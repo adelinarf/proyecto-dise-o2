@@ -23,15 +23,15 @@ class Benchmark {
         MAX_ITER_WITHOUT_IMPROVE = 10
         algorithms.addAll(
             mutableListOf(
-                "KNAPSACK_DP",
-                "KNAPSACK_HEURISTICS",
-                "KNAPSACK_LOCAL_SEARCH_SWAP",
-                "KNAPSACK_LOCAL_SEARCH_FLIP",
-                "KNAPSACK_ITERATIVE_LOCAL_SEARCH",
+                //"KNAPSACK_DP",
+                //"KNAPSACK_HEURISTICS",
+                //"KNAPSACK_LOCAL_SEARCH_SWAP",
+                //"KNAPSACK_LOCAL_SEARCH_FLIP",
+                //"KNAPSACK_ITERATIVE_LOCAL_SEARCH",
                 "KNAPSACK_TABU_SEARCH",
-                "KNAPSACK_SIMULATED_ANNEALING",
-                "KNAPSACK_GENETIC",
-                "KNAPSACK_GRASP"
+                //"KNAPSACK_SIMULATED_ANNEALING",
+                //"KNAPSACK_GENETIC",
+                //"KNAPSACK_GRASP"
             )
         )
     }
@@ -41,16 +41,16 @@ class Benchmark {
     fun load() : List<TestCase> {
         // Selection of instances
         val sources: List<String> = listOf("small-coef")
-        val sizes: List<Int> = listOf(100, 500, 1000, 5000, 10000)
+        val sizes: List<Int> = listOf(/*100, 500, */1000/*, 5000, 10000*/)
         val coefRanges : List<Int> = listOf(10000)
         val types : Map<Int, String> = mapOf(
-            1 to "uncorrelated",
-            2 to "weakly correlated",
-            3 to "strongly correlated",
-            4 to "inverse strongly correlated",
+            //1 to "uncorrelated",
+            //2 to "weakly correlated",
+            //3 to "strongly correlated",
+            //4 to "inverse strongly correlated",
             5 to "almost strongly correlated",
-            6 to "subset sum",
-            9 to "similar weights",
+            //6 to "subset sum",
+            //9 to "similar weights",
 
             // 11 to "uncorrelated",
             // 12 to "weakly_correlated",
@@ -72,7 +72,7 @@ class Benchmark {
                 val type = fileName[1].toInt()
                 val size = fileName[2].toInt()
                 val coefRange = fileName[3].toInt()
-                if (!sizes.contains(size) || !coefRanges.contains(coefRange)) return@forEach;
+                if (!sizes.contains(size) || !coefRanges.contains(coefRange) || !types.contains(type)) return@forEach;
 
                 // Read the first instance
                 var p = Vector<Int>()

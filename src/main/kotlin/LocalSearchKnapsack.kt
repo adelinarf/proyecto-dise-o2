@@ -92,7 +92,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		}
 	}
 
-	private fun isValidSolution(solution: IntArray): Boolean {
+	fun isValidSolution(solution: IntArray): Boolean {
 		return solution.zip(weights).sumOf { (a, b) -> a * b } <= capacity
 	}
 
