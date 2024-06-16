@@ -63,10 +63,10 @@ class Benchmark {
         // Reading process
         val instances: MutableList<TestCase> = ArrayList()
         for (source in sources) {
-            val folder = File(classLoader.getResource("pisinger/$source")?.file ?: "")
-
+            val folder = Paths.get(classLoader.getResource("pisinger/$source")?.toURI())
+            val files = Files.list(folder).map { it.toFile() }
             val fileInstances: MutableList<TestCase> = ArrayList()
-            folder.listFiles()?.forEach { file ->
+            files.forEach { file ->
                 // Check if file is from the selected sizes and coefRanges
                 val fileName = file.name.split(".")[0].split("_")
                 val type = fileName[1].toInt()
@@ -119,6 +119,7 @@ class Benchmark {
 
     fun test(): Unit = runBlocking(Dispatchers.Default) {
         val instances = load()
+        println("Loaded ${instances.size} instances.")
         val results: MutableList<TestResult> = ArrayList()
 
         val jobs = instances.flatMap { instance ->

@@ -1,3 +1,4 @@
+import kotlin.system.exitProcess
 
 
 suspend fun main() {
@@ -5,4 +6,5 @@ suspend fun main() {
     Benchmark().test()
     println("Tests done!")
     println("Active threads: ${Thread.activeCount()}")
+    exitProcess(0)
 }
