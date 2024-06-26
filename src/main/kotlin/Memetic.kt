@@ -185,7 +185,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
 
         while (true) {
             if (System.currentTimeMillis() > endTime) break
-            if (generations - lastGenerationForBestSolution > 1000) break
+            if (generations - lastGenerationForBestSolution > MAX_ITERATIONS) break
 
             val parents = getParents(population) // Parents compete
             val children = getChildren(parents.toMutableList()) // Parents crossover and children mutation
