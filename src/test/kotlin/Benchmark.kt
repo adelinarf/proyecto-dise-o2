@@ -21,18 +21,18 @@ class Benchmark {
         SHORT_MAX_ITERATIONS = 1000
         algorithms.addAll(
             mutableListOf(
-                // "KNAPSACK_DP",
-                // "KNAPSACK_HEURISTICS",
-                // "KNAPSACK_LOCAL_SEARCH_SWAP",
-                // "KNAPSACK_LOCAL_SEARCH_FLIP",
-                // "KNAPSACK_ITERATIVE_LOCAL_SEARCH",
-                // "KNAPSACK_TABU_SEARCH",
-                // "KNAPSACK_SIMULATED_ANNEALING",
-                // "KNAPSACK_GENETIC",
-                // "KNAPSACK_GRASP",
-                "KNAPSACK_MEMETIC",
-                "KNAPSACK_SCATTER_SEARCH",
-                "KNAPSACK_ANTS",
+                 "KNAPSACK_DP",
+                 "KNAPSACK_HEURISTICS",
+                 "KNAPSACK_LOCAL_SEARCH_SWAP",
+                 "KNAPSACK_LOCAL_SEARCH_FLIP",
+                 "KNAPSACK_ITERATIVE_LOCAL_SEARCH",
+                 "KNAPSACK_TABU_SEARCH",
+                 "KNAPSACK_SIMULATED_ANNEALING",
+                 "KNAPSACK_GENETIC",
+                 "KNAPSACK_GRASP",
+                 "KNAPSACK_MEMETIC",
+                 "KNAPSACK_SCATTER_SEARCH",
+                 "KNAPSACK_ANTS"
             )
         )
     }

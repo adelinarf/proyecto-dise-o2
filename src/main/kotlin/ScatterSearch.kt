@@ -1,5 +1,5 @@
 package main.kotlin
-class ScatterSearch(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int) {
+class ScatterSearch(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: String = "flip") {
 	private val grasp = GraspKnapsack(capacity, weights, profits, n)
 	private val ks = LocalSearchKnapsack(capacity, weights, profits, n)
 	private var bestSolution = IntArray(n) { 0 }
@@ -12,19 +12,10 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 		return ks.calculateFitness(solution)
 	}
 
-//	fun generateInitialPopulation(populationSize: Int): List<IntArray> {
-//		val population = mutableListOf<IntArray>()
-//		for (i in 0 until populationSize) {
-//			population.add(grasp.generateRandomizedGreedySolution())
-//		}
-//		return population
-//	}
-
 	fun generateInitialPopulation(populationSize: Int): List<IntArray> {
 		val population = mutableListOf<IntArray>()
-		val dichotomousPopulation = dichotomousGenerator()
 		for (i in 0 until populationSize) {
-			population.add(dichotomousPopulation.random())
+			population.add(grasp.generateRandomizedGreedySolution())
 		}
 		return population
 	}
