@@ -24,13 +24,32 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 		// ensure diversity, more distance == more diverse
 		val referenceSet = mutableListOf<IntArray>()
 		val populationSet = population.toMutableList()
+		// Initialize a map to keep track of the running total distances for each solution
+		val distanceTotals = mutableMapOf<IntArray, Int>()
+		
+		// Initially, all distances are 0 since the referenceSet is empty
+		populationSet.forEach { solution ->
+			distanceTotals[solution] = 0.0
+		}
+		
 		while (referenceSet.size < referenceSize) {
 			if (System.currentTimeMillis() > endTime) return population
-
-			val mostDistant = populationSet.maxByOrNull { solution -> referenceSet.sumOf { distance(it, solution) } }
-			referenceSet.add(mostDistant!!)
+		
+			// Find the solution with the maximum running total distance
+			val mostDistant = populationSet.maxByOrNull { solution ->
+				distanceTotals[solution] ?: 0
+			}!!
+		
+			referenceSet.add(mostDistant)
 			populationSet.remove(mostDistant)
+		
+			// Update the running total distances for the remaining solutions in populationSet
+			populationSet.forEach { solution ->
+				val newDistance = distance(mostDistant, solution)
+				distanceTotals[solution] = (distanceTotals[solution] ?: 0) + newDistance
+			}
 		}
+		
 		return referenceSet
 	}
 
