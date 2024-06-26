@@ -53,7 +53,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
             var changedTo = 0
             for (j in 0..genotype.size-1){
                 for (k in 0..genotype.size-1){
-                    if (j!=k){
+                    if (j!=k && genotype[k].size!=0 && genotype[j].size!=0){
                         val first = genotype[j][i]
                         val second = genotype[k][i]
                         if (first == second){
@@ -75,12 +75,21 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
                     }
                 }
             }
-            child.add(changedTo)
         }
+        var sumaa=0
+        for (f in 0..child.size-1){
+            if (child[f]==1){
+                sumaa+=weights[f]
+            }
+        }
+        if (sumaa<=capacity) {
+            return child.toIntArray()
+        }
+        return genotype.maxBy { ks.calculateFitness(it) }
 
         //var child: IntArray = firstGenotype.slice(0 until genotypeCutAt).toIntArray()
         //child += secondGenotype.slice(genotypeCutAt  until secondGenotype.size).toIntArray()
-        return child.toIntArray()
+        //return child.toIntArray()
     }
 
     private fun mutate(genotype: IntArray): IntArray {
@@ -106,6 +115,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
             genotype.add(firstParent)
             genotype.add(secondParent)*/
             var fchild = crossover2(genotype)
+            while (!ks.isValidSolution(fchild)) fchild = (crossover2(genotype))
             children.add(fchild)
             var firstChild = mutate(crossover2(genotype))
             while (!ks.isValidSolution(firstChild)) firstChild = mutate(crossover2(genotype))
@@ -148,7 +158,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
         var S = population.maxBy { ks.calculateFitness(it) }
         var Sb = population.maxBy { ks.calculateFitness(it) }
         var threshold = ks.calculateFitness(S)
-        var iterMax = 100
+        var iterMax = 20
         var i=0
         var neighbors : MutableList<IntArray> = getNeighbors(population)
         while (i < iterMax){
@@ -161,6 +171,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
                 Sb=S
             }
             i+=1
+            neighbors = getNeighbors(mutableListOf(Sb) )
         }
         return Sb
     }
@@ -181,7 +192,7 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
             population.addAll(children) // New population
             population = population.shuffled().toMutableList()
 
-            val populationBest = population.maxBy { ks.calculateFitness(it) }
+            val populationBest = thresholdSearch(population) //population.maxBy { ks.calculateFitness(it) }
             if (ks.calculateFitness(bestSolution) < ks.calculateFitness(populationBest)) {
                 bestSolution = populationBest
                 population = mutableListOf(populationBest)
