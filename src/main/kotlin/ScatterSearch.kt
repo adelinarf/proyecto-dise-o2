@@ -29,7 +29,7 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 		
 		// Initially, all distances are 0 since the referenceSet is empty
 		populationSet.forEach { solution ->
-			distanceTotals[solution] = 0.0
+			distanceTotals[solution] = 0
 		}
 		
 		while (referenceSet.size < referenceSize) {
