@@ -3,15 +3,16 @@ class GraspKnapsack(private val capacity: Int, private val weights: IntArray, pr
 	
 	private val ks = SearchUtils(n, capacity, weights, profits)
 
-	fun grasp(alpha: Double = 0.5): IntArray {
+	fun grasp(alpha: Double = 0.5, maxIterations: Int = -1): IntArray {
 		val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
+		val iterLimit = if (maxIterations > 0) maxIterations else MAX_ITERATIONS
 
 		var bestSolution = generateRandomizedGreedySolution(alpha)
 		var bestValue = ks.calculateFitness(bestSolution)
 		var iterationsWithoutImprovement = 0
 		val ls = LocalSearchKnapsack(capacity, weights, profits, n)
 
-		for (i in 0 until MAX_ITERATIONS) {
+		for (i in 0 until iterLimit) {
 			val initialSolution = generateRandomizedGreedySolution()
 			val localOptimum = ls.localSearch(initialSolution)
 			val localValue = ks.calculateFitness(localOptimum)
