@@ -4,6 +4,7 @@ import kotlin.math.max
 var TIME_LIMIT_MS = 120_000
 var MAX_ITERATIONS = 10_000
 var MAX_ITER_WITHOUT_IMPROVE = 10
+var SHORT_MAX_ITERATIONS = 1000
 
 enum class Algorithms {
     KNAPSACK_DP {
@@ -53,7 +54,7 @@ enum class Algorithms {
     KNAPSACK_LOCAL_SEARCH_FLIP {
 
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
-            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, 1)
+            val localSearchKnapsack = LocalSearchKnapsack(c, w, p, n, neighborhood = "flip")
             val sol = localSearchKnapsack.localSearch()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
@@ -103,6 +104,14 @@ enum class Algorithms {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val ants = GeneticMemetic(n, c, w, p, 10)
             val sol = ants.solve()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
+    },
+
+    KNAPSACK_SCATTER_SEARCH {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val scatterSearch = ScatterSearch(c, w, p, n)
+            val sol = scatterSearch.scatterSearch(populationSize = 20, referenceSize = 10)
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
     },

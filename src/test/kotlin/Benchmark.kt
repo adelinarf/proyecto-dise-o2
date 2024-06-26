@@ -1,8 +1,5 @@
 import kotlinx.coroutines.*
-import main.kotlin.Algorithms
-import main.kotlin.TIME_LIMIT_MS
-import main.kotlin.MAX_ITERATIONS
-import main.kotlin.MAX_ITER_WITHOUT_IMPROVE
+import main.kotlin.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -21,6 +18,7 @@ class Benchmark {
         TIME_LIMIT_MS = 60_000
         MAX_ITERATIONS = 10_000
         MAX_ITER_WITHOUT_IMPROVE = 10
+        SHORT_MAX_ITERATIONS = 1000
         algorithms.addAll(
             mutableListOf(
                 // "KNAPSACK_DP",
@@ -33,6 +31,7 @@ class Benchmark {
                 // "KNAPSACK_GENETIC",
                 // "KNAPSACK_GRASP",
                 "KNAPSACK_MEMETIC",
+                "KNAPSACK_SCATTER_SEARCH",
                 "KNAPSACK_ANTS",
             )
         )

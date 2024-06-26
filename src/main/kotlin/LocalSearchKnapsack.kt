@@ -1,11 +1,13 @@
 package main.kotlin
 
-class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: Int = 0) {
+class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArray, private val profits: IntArray, private val n: Int, private val neighborhood: String = "swap") {
 
-	private val ks = SearchUtils(n, capacity, weights, profits);
+	private val ks = SearchUtils(n, capacity, weights, profits)
+	private var endTime = Long.MAX_VALUE
 
-	fun localSearch(start: IntArray = intArrayOf(-1), greedy: Boolean = false): IntArray {
-		val endTime = System.currentTimeMillis() + TIME_LIMIT_MS
+	fun localSearch(start: IntArray = intArrayOf(-1), greedy: Boolean = false, maxIterations: Int = -1, endTime: Long = -1): IntArray {
+		this.endTime = if (endTime == -1L) System.currentTimeMillis() + TIME_LIMIT_MS else endTime
+		val iterLimit = if (maxIterations == -1) MAX_ITERATIONS else maxIterations
 
 		var bestSolution = start
 		if (bestSolution[0] == -1) {
@@ -13,7 +15,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 		}
 		var currentSolution = IntArray(n) { 0 }
 
-		for (i in 0 until MAX_ITERATIONS) {
+		for (i in 0 until iterLimit) {
 
 			currentSolution = bestSolution
 
@@ -24,12 +26,12 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 					break
 				}
 
-				if (System.currentTimeMillis() > endTime) {
+				if (System.currentTimeMillis() > this.endTime) {
 					return bestSolution
 				}
 			}
 
-			if (currentSolution == bestSolution) {
+			if (currentSolution.contentEquals(bestSolution)) {
 				break
 			}
 		}
@@ -39,8 +41,8 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 
 	fun neighbors(solution: IntArray): Sequence<IntArray> {
 		return when (neighborhood) {
-			0 -> swapNeighborhood(solution)
-			1 -> flipNeighborhood(solution)
+			"swap" -> swapNeighborhood(solution)
+			"flip" -> flipNeighborhood(solution)
 			else -> swapNeighborhood(solution)
 		}
 	}
@@ -87,7 +89,7 @@ class LocalSearchKnapsack(private val capacity: Int, private val weights: IntArr
 	private fun flipNeighborhood(solution: IntArray): Sequence<IntArray> = sequence {
 		for (i in solution.indices) {
 			val neighbor = solution.copyOf()
-			neighbor[i] = if (neighbor[i] == 0) 1 else 0
+			neighbor[i] = neighbor[i] xor 1
 			yield(neighbor)
 		}
 	}
