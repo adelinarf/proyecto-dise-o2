@@ -99,6 +99,14 @@ enum class Algorithms {
         }
     },
 
+    KNAPSACK_MEMETIC {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val ants = GeneticMemetic(n, c, w, p, 10)
+            val sol = ants.solve()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
+    },
+
     KNAPSACK_ANTS {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val ants = AntsColony(n, c, w, p, 10)

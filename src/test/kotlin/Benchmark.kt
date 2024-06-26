@@ -32,7 +32,8 @@ class Benchmark {
                 // "KNAPSACK_SIMULATED_ANNEALING",
                 // "KNAPSACK_GENETIC",
                 // "KNAPSACK_GRASP",
-                "KNAPSACK_ANTS"
+                "KNAPSACK_MEMETIC",
+                "KNAPSACK_ANTS",
             )
         )
     }
