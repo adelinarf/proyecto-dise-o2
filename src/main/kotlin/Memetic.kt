@@ -124,17 +124,15 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
     private fun getNeighbors(population: MutableList<IntArray>) : MutableList<IntArray>{
         var neighbors : MutableList<IntArray> = mutableListOf()
         for (p in population){
-            var neighbor = intArrayOf()
+            var neighbor = p.clone()
             for (x in 0..p.size-1){
                 if (p[x]==0){
-                    neighbor = p.clone()
                     neighbor[x] = 1
                     if (ks.isValidSolution(neighbor)){
                         neighbors.add(neighbor)
                     }
                 }
                 else{
-                    neighbor = p.clone()
                     neighbor[x] = 0
                     if (ks.isValidSolution(neighbor)){
                         neighbors.add(neighbor)
@@ -149,13 +147,13 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
         //https://arxiv.org/pdf/2101.04753v1
         var S = population.maxBy { ks.calculateFitness(it) }
         var Sb = population.maxBy { ks.calculateFitness(it) }
-        var threshold = 10
+        var threshold = ks.calculateFitness(S)
         var iterMax = 100
         var i=0
         var neighbors : MutableList<IntArray> = getNeighbors(population)
         while (i < iterMax){
             for (n in neighbors){
-                if (ks.calculateFitness(n) > threshold) {
+                if (ks.calculateFitness(n) <= threshold) {
                     S = n
                 }
             }
@@ -183,9 +181,10 @@ class GeneticMemetic (private val n: Int, private val capacity: Int, private val
             population.addAll(children) // New population
             population = population.shuffled().toMutableList()
 
-            val populationBest = thresholdSearch(population) //population.maxBy { ks.calculateFitness(it) }
+            val populationBest = population.maxBy { ks.calculateFitness(it) }
             if (ks.calculateFitness(bestSolution) < ks.calculateFitness(populationBest)) {
                 bestSolution = populationBest
+                population = mutableListOf(populationBest)
                 lastGenerationForBestSolution = generations
             }
 
