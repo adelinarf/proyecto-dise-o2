@@ -15,10 +15,10 @@ class Benchmark {
     private val algorithms = mutableListOf<String>()
     init {
         // Set global testing parameters
-        TIME_LIMIT_MS = 900_000
-        MAX_ITERATIONS = 100_000
-        MAX_ITER_WITHOUT_IMPROVE = 50
-        SHORT_MAX_ITERATIONS = 10_000
+        TIME_LIMIT_MS = 60_000
+        MAX_ITERATIONS = 10_000
+        MAX_ITER_WITHOUT_IMPROVE = 10
+        SHORT_MAX_ITERATIONS = 1000
         algorithms.addAll(
             mutableListOf(
                  "KNAPSACK_DP",

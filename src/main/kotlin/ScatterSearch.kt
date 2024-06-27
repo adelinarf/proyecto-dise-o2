@@ -97,6 +97,8 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 	fun pathRelinking(initialSolution: IntArray, targetSolution: IntArray) : List<IntArray> {
 		val path = mutableListOf<IntArray>()
 		val currentSolution = initialSolution.copyOf()
+		val startingBestSolution = bestSolution.copyOf()
+		val startingBestValue = bestValue
 
 		for (i in 0 until n) {
 			if (System.currentTimeMillis() > endTime) break
@@ -109,10 +111,15 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 				if (currentValue > bestValue) {
 					bestValue = currentValue
 					bestSolution = improvedSolution.copyOf()
-					iterationsWithoutImprovement = 0
 				}
 				path.add(improvedSolution)
 			}
+		}
+
+		if (bestValue > startingBestValue) {
+			iterationsWithoutImprovement = 0
+		} else {
+			iterationsWithoutImprovement++
 		}
 
 		return path
@@ -179,24 +186,22 @@ class ScatterSearch(private val capacity: Int, private val weights: IntArray, pr
 			val path = pathRelinking(referenceSet.random(), bestLocal)
 			referenceSet.addAll(path)
 
-			// Update best solution
-			val bestLocalValue = fitness(bestLocal)
-			if (bestLocalValue > bestValue) {
-				bestValue = bestLocalValue
-				bestSolution = bestLocal.copyOf()
-				iterationsWithoutImprovement = 0
-			} else {
-				iterationsWithoutImprovement++
+			// Restart if no improvement
+			if (iterationsWithoutImprovement > MAX_ITER_WITHOUT_IMPROVE) {
+				initialPopulation = generateInitialPopulation(populationSize).toMutableList()
+				referenceSet = mutableListOf<IntArray>()
+				for (solution in initialPopulation) {
+					val improvedSolution =
+						ks.localSearch(solution, endTime = this.endTime, maxIterations = SHORT_MAX_ITERATIONS)
+					referenceSet.add(improvedSolution)
+				}
 
-				// Restart if no improvement
-				if (iterationsWithoutImprovement > MAX_ITER_WITHOUT_IMPROVE) {
-					initialPopulation = generateInitialPopulation(populationSize).toMutableList()
-					referenceSet = mutableListOf<IntArray>()
-					for (solution in initialPopulation) {
-						val improvedSolution =
-							ks.localSearch(solution, endTime = this.endTime, maxIterations = SHORT_MAX_ITERATIONS)
-						referenceSet.add(improvedSolution)
-					}
+				// Find the best solution in new reference set
+				val newBest = referenceSet.maxByOrNull { fitness(it) }!!
+				val newBestValue = fitness(newBest)
+				if (newBestValue > bestValue) {
+					bestValue = newBestValue
+					bestSolution = newBest.copyOf()
 				}
 			}
 
