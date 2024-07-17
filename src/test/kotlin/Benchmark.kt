@@ -1,6 +1,8 @@
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import main.kotlin.*
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -11,15 +13,15 @@ import kotlin.system.measureTimeMillis
 
 class Benchmark {
     // Includes slack time for calculating result data
-    private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 300_000L
+    private val TEST_LIMIT_MS: Long  get() = TIME_LIMIT_MS + 600_000L
     private val algorithms = mutableListOf<String>()
     init {
         // Set global testing parameters
-        TIME_LIMIT_MS = 60_000
-        MAX_ITERATIONS = 10_000
+        TIME_LIMIT_MS = 120_000
+        MAX_ITERATIONS = 50_000
         MAX_ITER_WITHOUT_IMPROVE = 10
         SHORT_MAX_ITERATIONS = 1000
-        algorithms.addAll(
+        val addAll = algorithms.addAll(
             mutableListOf(
                 // "KNAPSACK_DP",
                 // "KNAPSACK_HEURISTICS",
@@ -28,18 +30,19 @@ class Benchmark {
                 // "KNAPSACK_ITERATIVE_LOCAL_SEARCH",
                 // "KNAPSACK_TABU_SEARCH",
                 // "KNAPSACK_SIMULATED_ANNEALING",
-                // "KNAPSACK_GENETIC",
+                // "KNAPSACK_ANTS",
+                "KNAPSACK_GENETIC",
                 // "KNAPSACK_GRASP",
                 "KNAPSACK_MEMETIC",
-                "KNAPSACK_SCATTER_SEARCH",
-                "KNAPSACK_ANTS",
+                // "KNAPSACK_SCATTER_SEARCH",
+                // "KNAPSACK_ANTS",
             )
         )
     }
 
     private val classLoader = Thread.currentThread().contextClassLoader
 
-    fun load() : List<TestCase> {
+    private fun load() : List<TestCase> {
         // Selection of instances
         val sources: List<String> = listOf("small-coef")
         val sizes: List<Int> = listOf(/*100, 500, 1000, 5000, */10000)
@@ -64,7 +67,7 @@ class Benchmark {
         // Reading process
         val instances: MutableList<TestCase> = ArrayList()
         for (source in sources) {
-            val folder = Paths.get(classLoader.getResource("pisinger/$source")?.toURI())
+            val folder = classLoader.getResource("pisinger/$source")?.toURI()?.let { Paths.get(it) }
             val files = Files.list(folder).map { it.toFile() }
             val fileInstances: MutableList<TestCase> = ArrayList()
             files.forEach { file ->
@@ -118,8 +121,59 @@ class Benchmark {
         return instances
     }
 
-    fun test(): Unit = runBlocking(Dispatchers.Default) {
-        val instances = load()
+    private fun customLoad() : List<TestCase> {
+        val sources: List<String> = listOf("custom")
+        // Reading process
+        val instances: MutableList<TestCase> = ArrayList()
+        for (source in sources) {
+            val folder = classLoader.getResource("pisinger/$source")?.toURI()?.let { Paths.get(it) }
+            val files = Files.list(folder).map { it.toFile() }
+            val fileInstances: MutableList<TestCase> = ArrayList()
+            files.forEach { file ->
+                // Read the first instance
+                var p = Vector<Int>()
+                var w = Vector<Int>()
+                var s = Vector<Int>()
+                var i = 0
+                val lines = file.readLines()
+                while (i < lines.size) {
+                    //if (lines[i].isBlank() || lines[i].startsWith("-")) break
+                    if (lines[i].isBlank() || lines[i].startsWith("-")) {
+                        i++
+                        p = Vector<Int>()
+                        w = Vector<Int>()
+                        s = Vector<Int>()
+                        continue
+                    }
+
+                    val name = lines[i++]
+                    val n = lines[i++].split(" ")[1].toInt()
+                    val c = lines[i++].split(" ")[1].toInt()
+                    i++
+                    // val z = lines[i++].split(" ")[1].toInt()
+
+                    val limit = i++
+                    while (i < lines.size && lines[i].isNotEmpty() && i <= limit + n) {
+                        val parts = lines[i++].split(",")
+                        p.add(parts[1].toInt())
+                        w.add(parts[2].toInt())
+                        // s.add(parts[3].toInt())
+                    }
+                    i++
+
+                    // Create the test case
+                    val testCase = TestCase(name, n, c, p.take(n), w.take(n), -1, s, "unknown")
+                    fileInstances.add(testCase)
+                }
+                instances.add(fileInstances[fileInstances.size - 1])
+            }
+        }
+
+        return instances
+    }
+
+    fun test(custom: Boolean = false): Unit = runBlocking(Dispatchers.Default) {
+        val instances = if (custom) customLoad() else load()
         println("Loaded ${instances.size} instances.")
         val results: MutableList<TestResult> = ArrayList()
 
@@ -136,19 +190,20 @@ class Benchmark {
                         algorithm.solve(instance.c, instance.w.toIntArray(), instance.p.toIntArray(), instance.n)
                     }
                     
-                        try {
-                            time = measureTimeMillis {
-                                r = future.get(TEST_LIMIT_MS, TimeUnit.MILLISECONDS) // Time limit for each test
-                            }
-                            println("Finished test for ${instance.name} with ${algorithm.name}.")
-                        } catch (e: TimeoutException) {
-                            future.cancel(true)
-                            r = -1
-                            time = Long.MAX_VALUE
-                        } finally {
-                            executor.shutdownNow()
+                    try {
+                        time = measureTimeMillis {
+                            r = future.get(TEST_LIMIT_MS, TimeUnit.MILLISECONDS) // Time limit for each test
                         }
+                        println("Finished test for ${instance.name} with ${algorithm.name}.")
+                    } catch (e: TimeoutException) {
+                        future.cancel(true)
+                        r = -1
+                        time = Long.MAX_VALUE
+                    } finally {
+                        executor.shutdownNow()
+                    }
 
+                    if (custom) instance.z = r
 
                     val testResult = TestResult(
                         instance.name,
@@ -176,7 +231,9 @@ class Benchmark {
         val path = Paths.get("src/test/resources/output.csv")
         val lines = results.map { it.toString() }.toMutableList()
         lines.add(0, TestResult.getHeader())
-        Files.write(path, lines)
+        withContext(Dispatchers.IO) {
+            Files.write(path, lines)
+        }
         withContext(Dispatchers.IO) { Files.write(path, lines) }
         println("Finished writing all the test results.")
 

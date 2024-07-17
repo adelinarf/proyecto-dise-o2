@@ -6,7 +6,7 @@ data class TestCase(
     val c: Int, // Capacity
     val p: List<Int>, // Profits
     val w: List<Int>, // Weights
-    val z: Int, // Optimal profit
+    var z: Int, // Optimal profit
     val s: Vector<Int>, // Optimal solution
     val t: String // Correlation Type
 ) {
