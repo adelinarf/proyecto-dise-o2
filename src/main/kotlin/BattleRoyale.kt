@@ -126,7 +126,7 @@ class BattleRoyale(
 		updateSafeArea()
 
 		// Save fighting and looting players for later
-		val fightingPlayers = mutableListOf<Player>()
+		val fightingPlayers = mutableListOf<List<Player>>()
 		val lootingPlayers = mutableMapOf<Int, Player>()
 
 
@@ -157,6 +157,8 @@ class BattleRoyale(
 
 			if (!player.alive) continue
 
+			val group = mutableListOf(player)
+
 			for (j in i+1 until players.size) {
 				val otherPlayer = players[j]
 
@@ -167,14 +169,14 @@ class BattleRoyale(
 				val distance = sqrt(distanceX*distanceX + distanceY*distanceY)
 				if (distance <= playerVision) {
 					// Fight if the other player is in vision range
-					fightingPlayers.add(player)
-					fightingPlayers.add(otherPlayer)
+					group += otherPlayer
 
 					// Remove players from looting
 					lootingPlayers.remove(player.id)
 					lootingPlayers.remove(otherPlayer.id)
 				}
 			}
+			fightingPlayers += group
 		}
 
 		// Fighting phase
@@ -184,36 +186,39 @@ class BattleRoyale(
 		players = loot(lootingPlayers.values.toList(), winners)
 	}
 
-	private fun fight(fighters: List<Player>): List<Player> {
+	private fun fight(fighters: List<List<Player>>): List<Player> {
 		val winners = mutableListOf<Player>()
 		val pool = fighters.toMutableList()
 
-		while (pool.size > 0) {
-			val fighter1 = pool.random()
-			pool.remove(fighter1)
+		for (list in pool) {
+			val group = list.toMutableList()
+			while (group.size > 0) {
+				val fighter1 = group.random()
+				group.remove(fighter1)
 
-			for (fighter2 in pool) {
-				if (System.currentTimeMillis() > endTime) break
-				// Each player deals random damage according to their fitness
-				// The player with the highest fitness deals more damage
-				val damage1 = Random.nextDouble(0.0, fighter1.getDamage()*playerMaxHP/10)
-				val damage2 = Random.nextDouble(0.0, fighter2.getDamage()*playerMaxHP/10)
+				for (fighter2 in group) {
+					if (System.currentTimeMillis() > endTime) break
+					// Each player deals random damage according to their fitness
+					// The player with the highest fitness deals more damage
+					val damage1 = Random.nextDouble(0.0, fighter1.getDamage() * playerMaxHP / 10)
+					val damage2 = Random.nextDouble(0.0, fighter2.getDamage() * playerMaxHP / 10)
 
-				// Deal damage to each player
-				fighter1.hp = maxOf(fighter1.hp - damage2, 0.0).toInt()
-				fighter2.hp = maxOf(fighter2.hp - damage1, 0.0).toInt()
+					// Deal damage to each player
+					fighter1.hp = maxOf(fighter1.hp - damage2, 0.0).toInt()
+					fighter2.hp = maxOf(fighter2.hp - damage1, 0.0).toInt()
 
-				// If a player dies, scavenge their solution with the other player
-				if (fighter1.alive && !fighter2.alive) {
-					fighter1.solution = scavenge(fighter1.solution, fighter2.solution)
-				} else if (!fighter1.alive && fighter2.alive) {
-					fighter2.solution = scavenge(fighter2.solution, fighter1.solution)
+					// If a player dies, scavenge their solution with the other player
+					if (fighter1.alive && !fighter2.alive) {
+						fighter1.solution = scavenge(fighter1.solution, fighter2.solution)
+					} else if (!fighter1.alive && fighter2.alive) {
+						fighter2.solution = scavenge(fighter2.solution, fighter1.solution)
+					}
 				}
-			}
 
-			// Check if the player is still alive
-			if (fighter1.alive) {
-				winners.add(fighter1)
+				// Check if the player is still alive
+				if (fighter1.alive) {
+					winners.add(fighter1)
+				}
 			}
 		}
 		
