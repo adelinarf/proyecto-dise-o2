@@ -122,6 +122,22 @@ enum class Algorithms {
             val sol = ants.solve()
             return sol.zip(p).sumOf { (a, b) -> a * b }
         }
+    },
+
+    KNAPSACK_BRO {
+        override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
+            val bro = BattleRoyale(c, w, p, n,
+                maximumPlayers = 100,
+                safeAreaInitialRadius = 100,
+                shrinkRate = 0.1,
+                playerVision = 2,
+                playerMaxSpeed = 1.0,
+                playerMinSpeed = 0.1,
+                playerMovementLiberty = 0.25
+            )
+            val sol = bro.run()
+            return sol.zip(p).sumOf { (a, b) -> a * b }
+        }
     };
 
     abstract fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int
