@@ -127,13 +127,14 @@ enum class Algorithms {
     KNAPSACK_BRO {
         override fun solve(c: Int, w: IntArray, p: IntArray, n: Int): Int {
             val bro = BattleRoyale(c, w, p, n,
-                maximumPlayers = 100,
-                safeAreaInitialRadius = 100,
-                shrinkRate = 0.1,
+                maximumPlayers = 1000,
+                safeAreaInitialRadius = 1000,
+                shrinkRate = 0.01,
                 playerVision = 2,
                 playerMaxSpeed = 1.0,
                 playerMinSpeed = 0.1,
-                playerMovementLiberty = 0.25
+                playerMovementLiberty = 0.25,
+                alpha = 0.5,
             )
             val sol = bro.run()
             return sol.zip(p).sumOf { (a, b) -> a * b }

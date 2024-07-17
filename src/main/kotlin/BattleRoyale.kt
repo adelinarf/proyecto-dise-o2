@@ -15,7 +15,7 @@ class BattleRoyale(
 		private val safeAreaInitialRadius: Int = 100,
 		private var center: Pair<Double, Double> = Pair(0.0, 0.0),
 		private var dynamicCenter: Boolean = false,
-		private val shrinkRate: Double = 0.5,
+		private var shrinkRate: Double = 0.5,
 		private val maxZoneDamage: Double = 0.1,
 		private val playerMaxHP: Int = 100,
 		private val playerVision: Int = 2,
@@ -193,6 +193,7 @@ class BattleRoyale(
 			pool.remove(fighter1)
 
 			for (fighter2 in pool) {
+				if (System.currentTimeMillis() > endTime) break
 				// Each player deals random damage according to their fitness
 				// The player with the highest fitness deals more damage
 				val damage1 = Random.nextDouble(0.0, fighter1.getDamage()*playerMaxHP/10)
@@ -236,6 +237,8 @@ class BattleRoyale(
 		// and a list of winners from the fight
 		// everyone is able to loot, but the winners have less time to do so
 		for (player in lootingPlayers) {
+			if (System.currentTimeMillis() > endTime) break
+
 			player.solution = ks.localSearch(player.solution, endTime = endTime, maxIterations = SHORT_MAX_ITERATIONS)
 			val currentValue = player.fitness
 			if (currentValue > bestValue) {
@@ -246,6 +249,8 @@ class BattleRoyale(
 
 		// Winners have less time to loot
 		for (player in winners) {
+			if (System.currentTimeMillis() > endTime) break
+
 			player.solution = ks.localSearch(player.solution, endTime = endTime, maxIterations = SHORT_MAX_ITERATIONS/2)
 			val currentValue = player.fitness
 			if (currentValue > bestValue) {
@@ -260,6 +265,7 @@ class BattleRoyale(
 	fun run(maxIterations: Int = -1, endTime: Long = -1, verbose: Boolean = false): IntArray {
 		this.endTime = if (endTime == -1L) System.currentTimeMillis() + TIME_LIMIT_MS else endTime
 		val iterLimit = if (maxIterations == -1) MAX_ITERATIONS else maxIterations
+		val totalTime = endTime - System.currentTimeMillis()
 
 		// Drop players in the map
 		players = generateInitialPlayers(maximumPlayers)
@@ -288,6 +294,12 @@ class BattleRoyale(
 				println("\tSafe area radius: $safeAreaRadius")
 				println("###############################################")
 				break
+			}
+
+			// if at 75% of the time limit, increase shrink rate
+			val ellapsedTime = endTime - System.currentTimeMillis()
+			if (ellapsedTime < totalTime * 0.25) {
+				shrinkRate *= 2
 			}
 		}
 
